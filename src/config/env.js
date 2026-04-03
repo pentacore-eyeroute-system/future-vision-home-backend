@@ -11,4 +11,5 @@ export default {
         password: process.env.MYSQL_PASSWORD,
         database: process.env.MYSQL_DATABASE,        
     },
+    adminSecretKey : process.env.ADMIN_SECRET_KEY,
 }
