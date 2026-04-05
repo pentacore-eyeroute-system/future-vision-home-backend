@@ -12,4 +12,10 @@ export default {
         database: process.env.MYSQL_DATABASE,        
     },
     adminSecretKey : process.env.ADMIN_SECRET_KEY,
+    s3: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        s3BucketRegion: process.env.S3_BUCKET_REGION,
+        s3BucketName: process.env.S3_BUCKET_NAME,
+    },
 }
