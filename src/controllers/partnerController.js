@@ -65,26 +65,6 @@ export class PartnerController {
         }
     };
 
-    updateIsArchivedStatus = async (req, res) => {
-        try {
-            const partnerId = req.params.id;
-            const isArchived = req.body.isArchived;
-
-            const result = await partnerService.updateIsArchivedStatus(partnerId, isArchived);
-
-            res.status(200).json({
-                success: true,
-                message: 'Partner isArchived status update success',
-                result
-            });
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error: err.message,
-            });    
-        }
-    };
-
     updateIsTemporarilyDeletedStatus = async (req, res) => {
         try {
             const partnerId = req.params.id;

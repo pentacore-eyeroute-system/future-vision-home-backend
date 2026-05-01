@@ -5,8 +5,7 @@ export class PartnerService {
         const partner = await Partner.create({
             par_fullname : partnerData.fullname,
             par_type : partnerData.type,
-            par_isArchived : false,
-            par_isTemporarilyDeleted: false,
+            par_is_temporarily_deleted: false,
         });
 
         return partner;
@@ -33,20 +32,6 @@ export class PartnerService {
         return partner;
     };
 
-    async updateIsArchivedStatus(partnerId, isArchived) {
-        const partner = await Partner.findByPk(partnerId);
-
-        if (!partner) {
-            throw new Error('Partner not found')
-        }
-
-        partner.update({
-            par_isArchived : isArchived,
-        });
-
-        return partner;
-    };
-
     async updateIsTemporarilyDeletedStatus(partnerId, isTemporarilyDeleted) {
         const partner = await Partner.findByPk(partnerId);
 
@@ -55,7 +40,7 @@ export class PartnerService {
         }
 
         partner.update({
-            par_isTemporarilyDeleted: isTemporarilyDeleted,
+            par_is_temporarily_deleted: isTemporarilyDeleted,
         });
 
         return partner;

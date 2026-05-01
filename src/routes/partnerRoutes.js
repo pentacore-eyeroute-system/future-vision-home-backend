@@ -11,11 +11,8 @@ router.post('/add-partner', authenticateToken, partnerController.addPartner);
 // GET route
 router.get('/get-all-partners', authenticateToken, partnerController.getAllPartners);
 
-// PUT route
-router.put('/update-partner-info/:id', authenticateToken, partnerController.updatePartnerInfo);
-
 // PATCH route
-router.patch('/archive-partner/:id', authenticateToken, partnerController.updateIsArchivedStatus);
+router.patch('/update-partner-info/:id', authenticateToken, partnerController.updatePartnerInfo);
 router.patch('/temporary-delete-partner/:id', authenticateToken, partnerController.updateIsTemporarilyDeletedStatus);
 
 // "DELETE" route (soft delete)

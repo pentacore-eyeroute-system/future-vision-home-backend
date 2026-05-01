@@ -12,12 +12,7 @@ export const Partner = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        par_isArchived: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        par_isTemporarilyDeleted: {
+        par_is_temporarily_deleted: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
