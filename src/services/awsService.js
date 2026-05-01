@@ -55,6 +55,25 @@ export class AwsService {
         return fileKey;
     };
 
+    async uploadGalleryPic(file) {
+        const folderName = 'galleries-pictures';
+        const extension = file.mimetype.split('/')[1];
+        const fileKey = `${folderName}/${uuid4()}.${extension}`;
+
+        const uploadParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+
+        const command = new PutObjectCommand(uploadParameters);
+
+        await s3.send(command);
+
+        return fileKey;
+    };
+
     async getVisionistaPic(fileKey) {
         const bucketParameters = {
             Bucket: S3_BUCKET_NAME,
@@ -81,6 +100,19 @@ export class AwsService {
         return url;
     };
 
+    async getGalleryPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new GetObjectCommand(bucketParameters);
+
+        const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+
+        return url;
+    };    
+
     async hardDeleteNewsPic(fileKey) {
         const bucketParameters = {
             Bucket: S3_BUCKET_NAME,
@@ -93,4 +125,17 @@ export class AwsService {
 
         return newsPicture;
     };
+
+    async hardDeleteGalleryPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+        
+        const command = new DeleteObjectCommand(bucketParameters);
+
+        const newsPicture = await s3.send(command);
+
+        return newsPicture;
+    };    
 }
