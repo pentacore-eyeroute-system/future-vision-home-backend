@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid4 } from "uuid";
 import config from '../config/env.js';
@@ -36,6 +36,25 @@ export class AwsService {
         return fileKey;
     };
 
+    async uploadNewsPic(file) {
+        const folderName = 'news-pictures';
+        const extension = file.mimetype.split('/')[1];
+        const fileKey = `${folderName}/${uuid4()}.${extension}`;
+
+        const uploadParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+
+        const command = new PutObjectCommand(uploadParameters);
+
+        await s3.send(command);
+
+        return fileKey;
+    };
+
     async getVisionistaPic(fileKey) {
         const bucketParameters = {
             Bucket: S3_BUCKET_NAME,
@@ -47,5 +66,31 @@ export class AwsService {
         const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
 
         return url;
+    };
+
+    async getNewsPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new GetObjectCommand(bucketParameters);
+
+        const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+
+        return url;
+    };
+
+    async hardDeleteNewsPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+        
+        const command = new DeleteObjectCommand(bucketParameters);
+
+        const newsPicture = await s3.send(command);
+
+        return newsPicture;
     };
 }
