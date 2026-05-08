@@ -1,12 +1,14 @@
 import { News } from "../models/newsModel.js";
 
 export class NewsService {
-    async createNews(newsData) {
+    async createNews(newsData, transaction) {
         const news = await News.create({
             news_title : newsData.title,
             news_description : newsData.description,
             news_date : newsData.date,
             news_isTemporarilyDeleted : false,
+        }, {
+            transaction
         });
 
         return news;
@@ -18,17 +20,23 @@ export class NewsService {
         return news;
     };
 
-    async updateNewsInfo(newsId, newsData) {
-        const news = await News.findByPk(newsId);
+    async findById(newsId, transaction) {
+        const news = await News.findByPk(newsId, { transaction });
 
         if (!news) {
             throw new Error('News not found');
         };
 
+        return news;
+    };
+
+    async updateNewsInfo(news, newsData, transaction) {
         await news.update({
             news_title : newsData.title,
             news_description : newsData.description,
             news_date : newsData.date,
+        }, {
+            transaction
         });
 
         return news;
@@ -48,13 +56,7 @@ export class NewsService {
         return news;
     };
 
-    async softDeleteNews(newsId) {
-        const news = await News.findByPk(newsId);
-
-        if (!news) {
-            throw new Error('News not found');
-        };
-
-        await news.destroy();
+    async softDeleteNews(news, transaction) {
+        await news.destroy({ transaction });
     };
 }

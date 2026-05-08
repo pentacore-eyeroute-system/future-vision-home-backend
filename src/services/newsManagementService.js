@@ -1,3 +1,4 @@
+import { sequelize } from "../config/db.js";
 import { AwsService } from "./awsService.js";
 import { NewsService } from "./newsService.js";
 import { NewsPicturesService } from "./newsPicturesService.js";
@@ -5,31 +6,51 @@ import { NewsPicturesService } from "./newsPicturesService.js";
 const awsService = new AwsService();
 const newsService = new NewsService(); 
 const newsPicturesService = new NewsPicturesService();
-
 export class NewsManagementService {
     async createNews(newsData) {
-        // Stores news info 
-        const news = await newsService.createNews(newsData);
-        
-        let newsPictures = [];
+        const transaction = await sequelize.transaction();
 
-        // Loops through all pictures
-        for (let i = 0; i < newsData.files.length; i++) {
-            const file = newsData.files[i];
+        const uploadedFileKeys = [];
 
-            // Uploads req.file to aws s3
-            const fileKey = await awsService.uploadNewsPic(file);
+        try {
+            // Stores news info 
+            const news = await newsService.createNews(newsData, transaction);
+            
+            const newsPictures = [];
 
-            // Stores picture file key or path associated with news
-            const newsPicture = await newsPicturesService.addNewsPicture(news.id, fileKey);
+            // Loops through all pictures
+            for (let i = 0; i < newsData.files.length; i++) {
+                const file = newsData.files[i];
 
-            newsPictures.push(newsPicture);
-        };
+                // Uploads req.file to aws s3
+                const fileKey = await awsService.uploadNewsPic(file);
 
-        return {
-            ...news.toJSON(),
-            newsPictures: newsPictures,
-        };
+                uploadedFileKeys.push(fileKey);
+
+                // Stores picture file key or path associated with news
+                const newsPicture = await newsPicturesService.addNewsPicture(news.id, fileKey, transaction);
+
+                newsPictures.push(newsPicture);
+            };
+
+            await transaction.commit();
+
+            return {
+                ...news.toJSON(),
+                newsPictures: newsPictures,
+            };
+        } catch (err) {
+            await transaction.rollback();
+
+            // Cleanups uploaded files
+            for (let i = 0; i < uploadedFileKeys.length; i++) {
+                const fileKey = uploadedFileKeys[i];
+
+                await awsService.hardDeleteNewsPic(fileKey);
+            }
+
+            throw err;
+        }
     };
 
     async getAllNews() {
@@ -69,44 +90,76 @@ export class NewsManagementService {
     };
 
     async updateNewsInfo(newsId, newsData) {
-        // Updates news info
-        const news = await newsService.updateNewsInfo(newsId, newsData);
+        const transaction = await sequelize.transaction();
 
-        // Retrieves current pictures associated to news
-        const newsPictures = await newsPicturesService.getAllPicturesByNews(newsId);
+        // Newly uploaded pictures
+        const uploadedNewFileKeys = [];
 
-        // Finds deleted pictures againts existing pictures id
-        const picturesToDelete = newsPictures.filter(newsPicture => !newsData.existingNewsPicturesIds.includes(newsPicture.id)); 
+        // Old pictures to delete after commit
+        const oldFileKeysToDelete = [];
 
-        for (let i = 0; i < picturesToDelete.length; i++) {
-            const newsPicture = picturesToDelete[i];
+        try {
+            const news = await newsService.findById(newsId, transaction);
 
-            // Soft deletes picture in table
-            await newsPicturesService.softDeleteNewsPictureById(newsPicture.id);
+            // Updates news info
+            const updatedNews = await newsService.updateNewsInfo(news, newsData, transaction);
 
-            // Hard deletes picture in aws s3 bucket
-            await awsService.hardDeleteNewsPic(newsPicture.npi_pic_path);
+            // Retrieves current pictures associated to news
+            const newsPictures = await newsPicturesService.getAllPicturesByNews(newsId, transaction);
+
+            // Finds deleted pictures againts existing pictures id
+            const picturesToDelete = newsPictures.filter(newsPicture => !newsData.existingNewsPicturesIds.includes(newsPicture.id));      
+
+            for (let i = 0; i < picturesToDelete.length; i++) {
+                const newsPicture = picturesToDelete[i];
+
+                // Soft deletes picture in table
+                await newsPicturesService.softDeleteNewsPictureById(newsPicture, transaction);
+
+                oldFileKeysToDelete.push(newsPicture.npi_pic_path);
+            }
+
+            const newsPicturesToSend = [];
+
+            // Loops through all pictures
+            for (let i = 0; i < newsData.files.length; i++) {
+                const file = newsData.files[i];
+
+                // Uploads new pictures to aws s3
+                const fileKey = await awsService.uploadNewsPic(file);
+
+                uploadedNewFileKeys.push(fileKey);
+
+                // Stores new picture file key or path associated with news
+                const newsPicture = await newsPicturesService.addNewsPicture(news.id, fileKey, transaction);
+
+                newsPicturesToSend.push(newsPicture);
+            };
+
+            await transaction.commit();
+
+            for (let i = 0; i < oldFileKeysToDelete.length; i++) {
+                const fileKey = oldFileKeysToDelete[i];
+
+                // Hard deletes picture in aws s3 bucket
+                await awsService.hardDeleteNewsPic(fileKey);
+            }
+
+            return {
+                ...updatedNews.toJSON(),
+                newsPictures: newsPicturesToSend,
+            };
+        } catch (err) {
+            await transaction.rollback();
+
+            // Cleanups newly uploaded files
+            for (let i = 0; i < uploadedNewFileKeys.length; i++) {
+                const fileKey = uploadedNewFileKeys[i];
+
+                await awsService.hardDeleteNewsPic(fileKey);
+            }
+            throw err;
         }
-
-        let newsPicturesToSend = [];
-
-        // Loops through all pictures
-        for (let i = 0; i < newsData.files.length; i++) {
-            const file = newsData.files[i];
-
-            // Uploads new pictures to aws s3
-            const fileKey = await awsService.uploadNewsPic(file);
-
-            // Stores new picture file key or path associated with news
-            const newsPicture = await newsPicturesService.addNewsPicture(news.id, fileKey);
-
-            newsPicturesToSend.push(newsPicture);
-        };
-
-        return {
-            ...news.toJSON(),
-            newsPictures: newsPicturesToSend,
-        };
     };
 
     async updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted) {
@@ -116,10 +169,22 @@ export class NewsManagementService {
     };
 
     async softDeleteNews(newsId) {
-        // Soft deletes news in table
-        await newsService.softDeleteNews(newsId);
+        const transaction = await sequelize.transaction();
 
-        // Soft deletes news picture in table
-        await newsPicturesService.softDeleteNewsPicturesByNewsId(newsId);
+        try {
+            const news = await newsService.findById(newsId, transaction);
+
+            // Soft deletes news in table
+            await newsService.softDeleteNews(news, transaction);
+
+            // Soft deletes news picture in table
+            await newsPicturesService.softDeleteNewsPicturesByNewsId(news.id, transaction);
+
+            await transaction.commit();
+        } catch (err) {
+            await transaction.rollback();
+
+            throw err;
+        }
     };
 }
