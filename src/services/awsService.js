@@ -113,6 +113,19 @@ export class AwsService {
         return url;
     };    
 
+    async hardDeleteVisionistaPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new DeleteObjectCommand(bucketParameters);
+
+        const visionistaPic = await s3.send(command);
+
+        return visionistaPic;
+    }
+
     async hardDeleteNewsPic(fileKey) {
         const bucketParameters = {
             Bucket: S3_BUCKET_NAME,

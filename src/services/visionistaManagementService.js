@@ -1,21 +1,38 @@
 import { VisionistaService } from "./visionistaService.js";
 import { AwsService } from "./awsService.js";
+import { sequelize } from "../config/db.js";
 
 const visionistaService = new VisionistaService();
 const awsService = new AwsService();
 
 export class VisionistaManagementService {
     async addVisionista(visionistaData) {
-        const fileKey = await awsService.uploadVisionistaPic(visionistaData.file);
+        let fileKey = null;
+        
+        const transaction = await sequelize.transaction();
 
-        visionistaData = {
-            ...visionistaData,
-            fileKey : fileKey
-        }
+        try { 
+            fileKey = await awsService.uploadVisionistaPic(visionistaData.file);
 
-        const visionista = await visionistaService.createVisionista(visionistaData);
+            visionistaData = {
+                ...visionistaData,
+                fileKey : fileKey
+            }
 
-        return visionista;
+            const visionista = await visionistaService.createVisionista(visionistaData, transaction);
+
+            await transaction.commit();
+
+            return visionista;
+        } catch (err) {
+            await transaction.rollback();
+
+            if (fileKey) {
+                await awsService.hardDeleteVisionistaPic(fileKey);
+            }
+
+            throw err;
+        }        
     };
 
     async getAllVisionistas() {
@@ -37,16 +54,46 @@ export class VisionistaManagementService {
     };
 
     async updateVisionistaInfo(visionistaId, visionistaData) {
-        const fileKey = await awsService.uploadVisionistaPic(visionistaData.file);
+        let newFileKey = null;
+        let oldFileKey = null;
 
-        visionistaData = {
-            ...visionistaData,
-            fileKey : fileKey
-        }
+        const transaction = await sequelize.transaction();
 
-        const visionista = await visionistaService.updateVisionistaInfo(visionistaId, visionistaData);
+        try {
+            const visionista = await visionistaService.findById(visionistaId, transaction);
 
-        return visionista;
+            // Retrieves existing file key in table
+            oldFileKey = visionista.vis_pic_path;
+
+            // Uploads new picture in aws s3
+            newFileKey =  await awsService.uploadVisionistaPic(visionistaData.file);
+
+            visionistaData = {
+                ...visionistaData,
+                fileKey : newFileKey
+            }
+
+            // Updates visionista info in table
+            const updatedVisionista = await visionistaService.updateVisionistaInfo(visionista, visionistaData, transaction);
+
+            await transaction.commit();
+
+            // Deletes picture in aws s3
+            if (oldFileKey) {
+                await awsService.hardDeleteVisionistaPic(oldFileKey);
+            }
+
+            return updatedVisionista;
+        } catch (err) {
+            await transaction.rollback();
+
+            // Cleanups newly uploaded image
+            if (newFileKey) {
+                await awsService.hardDeleteVisionistaPic(newFileKey);
+            }
+
+            throw err;
+        }    
     };
 
     async updateIsArchivedStatus(visionistaId, isArchived) {
@@ -62,8 +109,22 @@ export class VisionistaManagementService {
     };
 
     async softDeleteVisionista(visionistaId) {
-        const visionista = await visionistaService.softDeleteVisionista(visionistaId);
+        const transaction = await sequelize.transaction();
 
-        return visionista;
+        try {
+            const visionista = await visionistaService.findById(visionistaId, transaction);
+
+            // Soft deletes visionista in table
+            await visionistaService.softDeleteVisionista(visionista, transaction);
+
+            await transaction.commit();
+
+            // Hard deletes visionista pic in aws s3
+            await awsService.hardDeleteVisionistaPic(visionista.vis_pic_path);
+        } catch (err) {
+            await transaction.rollback();
+
+            throw err;
+        }
     };
 }
