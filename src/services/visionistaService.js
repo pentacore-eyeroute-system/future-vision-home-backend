@@ -73,7 +73,7 @@ export class VisionistaService {
         return visionista;
     };
 
-    async softDeleteVisionista(visionistaId, transaction) {
+    async softDeleteVisionista(visionista, transaction) {
         await visionista.destroy({ transaction });
 
         return visionista;
