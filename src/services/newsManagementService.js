@@ -171,8 +171,13 @@ export class NewsManagementService {
     async softDeleteNews(newsId) {
         const transaction = await sequelize.transaction();
 
+        let newsPictures = [];
+
         try {
             const news = await newsService.findById(newsId, transaction);
+
+            // Retrieves current pictures associated to news
+            newsPictures = await newsPicturesService.getAllPicturesByNews(news.id, transaction);
 
             // Soft deletes news in table
             await newsService.softDeleteNews(news, transaction);
@@ -181,6 +186,13 @@ export class NewsManagementService {
             await newsPicturesService.softDeleteNewsPicturesByNewsId(news.id, transaction);
 
             await transaction.commit();
+
+            // Hard deletes news pictures in aws s3
+            for (let i = 0; i < newsPictures.length; i++) {
+                const fileKey = newsPictures[i].npi_pic_path;
+
+                await awsService.hardDeleteNewsPic(fileKey);
+            }
         } catch (err) {
             await transaction.rollback();
 
