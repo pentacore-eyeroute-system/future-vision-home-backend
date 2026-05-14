@@ -1,12 +1,14 @@
 import { Gallery } from "../models/galleryModel.js";
 
 export class GalleryService {
-    async createGallery(galleryData) {
+    async createGallery(galleryData, transaction) {
         const gallery = await Gallery.create({
             gal_title : galleryData.title,
             gal_description : galleryData.description,
             gal_date : galleryData.date,
             gal_isTemporarilyDeleted : false,
+        }, {
+            transaction
         });
 
         return gallery;
@@ -18,17 +20,19 @@ export class GalleryService {
         return gallery;
     };
 
-    async updateGalleryInfo(galleryId, galleryData) {
-        const gallery = await Gallery.findByPk(galleryId);
+    async findById(galleryId, transaction) {
+        const gallery = await Gallery.findByPk(galleryId, { transaction });
 
-        if (!gallery) {
-            throw new Error('Gallery not found');
-        };
+        return gallery;
+    };
 
+    async updateGalleryInfo(gallery, galleryData, transaction) {
         await gallery.update({
             gal_title : galleryData.title,
             gal_description : galleryData.description,
             gal_date : galleryData.date,
+        }, { 
+            transaction 
         });
 
         return gallery;
@@ -48,13 +52,7 @@ export class GalleryService {
         return gallery;
     };
 
-    async softDeleteGallery(galleryId) {
-        const gallery = await Gallery.findByPk(galleryId);
-
-        if (!gallery) {
-            throw new Error('Gallery not found');
-        };
-
-        await gallery.destroy();
+    async softDeleteGallery(gallery, transaction) {
+        await gallery.destroy({ transaction });
     };
 }
