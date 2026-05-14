@@ -69,26 +69,6 @@ export class VisionistaController {
         }
     };
 
-    updateIsArchivedStatus = async (req, res) => {
-        try {
-            const visionistaId = req.params.id;
-            const isArchived = req.body.isArchived;
-
-            const result = await visionistaManagementService.updateIsArchivedStatus(visionistaId, isArchived);
-
-            res.status(200).json({
-                success: true,
-                message: 'Visionista isArchived status update success',
-                result
-            });
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error: err.message,
-            });    
-        }
-    };
-
     updateIsTemporarilyDeletedStatus = async (req, res) => {
         try {
             const visionistaId = req.params.id;

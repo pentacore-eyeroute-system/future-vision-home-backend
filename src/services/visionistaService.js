@@ -45,20 +45,6 @@ export class VisionistaService {
         return visionista;
     };
 
-    async updateIsArchivedStatus(visionistaId, isArchived) {
-        const visionista = await Visionista.findByPk(visionistaId);
-
-        if (!visionista) {
-            throw new Error('Visionista not found')
-        }
-
-        await visionista.update({
-            vis_isArchived : isArchived,
-        });
-
-        return visionista;
-    };
-
     async updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted) {
         const visionista = await Visionista.findByPk(visionistaId);
 

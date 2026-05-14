@@ -17,7 +17,6 @@ router.get('/get-all-visionistas', authenticateToken, visionistaController.getAl
 
 // PATCH route
 router.patch('/update-visionista-info/:id', authenticateToken, upload.single('image'), visionistaController.updateVisionistaInfo);
-router.patch('/archive-visionista/:id', authenticateToken, visionistaController.updateIsArchivedStatus);
 router.patch('/temporary-delete-visionista/:id', authenticateToken, visionistaController.updateIsTemporarilyDeletedStatus);
 
 // "DELETE" route (soft delete)

@@ -96,12 +96,6 @@ export class VisionistaManagementService {
         }    
     };
 
-    async updateIsArchivedStatus(visionistaId, isArchived) {
-        const visionista = await visionistaService.updateIsArchivedStatus(visionistaId, isArchived);
-
-        return visionista;
-    };
-
     async updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted) {
         const visionista = await visionistaService.updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted);
 
