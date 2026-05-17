@@ -10,6 +10,7 @@ router.post('/add-partner', authenticateToken, partnerController.addPartner);
 
 // GET route
 router.get('/get-all-partners', authenticateToken, partnerController.getAllPartners);
+router.get('/temporary-deleted-partners', authenticateToken, partnerController.getAllTemporarilyDeletedPartners);
 
 // PATCH route
 router.patch('/update-partner-info/:id', authenticateToken, partnerController.updatePartnerInfo);

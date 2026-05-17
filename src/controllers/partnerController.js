@@ -42,6 +42,23 @@ export class PartnerController {
         }
     };
 
+    getAllTemporarilyDeletedPartners = async (req, res) => {
+        try {
+            const result = await partnerService.getAllTemporarilyDeletedPartners();
+
+            res.status(200).json({
+                success: true,
+                message: 'Temporarily deleted partners retrieval success',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });                  
+        }
+    };
+
     updatePartnerInfo = async (req, res) => {
         try {
             const partnerId = req.params.id;

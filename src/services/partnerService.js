@@ -17,6 +17,17 @@ export class PartnerService {
         return partner;
     };
 
+    async getAllTemporarilyDeletedPartners() {
+        const temporarilyDeletedPartners = await Visionista.findAll({ 
+            where : {
+                par_is_temporarily_deleted: true,
+                deletedAt: null,
+            }, 
+        });
+
+        return temporarilyDeletedPartners;
+    };
+
     async updatePartnerInfo(partnerId, partnerData) {
         const partner = await Partner.findByPk(partnerId);
 
