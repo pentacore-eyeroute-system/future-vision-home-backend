@@ -14,6 +14,7 @@ router.post('/create-news', authenticateToken, upload.array('images'), newsContr
 
 // GET route
 router.get('/get-all-news', authenticateToken, newsController.getAllNews);
+router.get('/temporary-deleted-news', authenticateToken, newsController.getAllTemporarilyDeletedNews);
 
 // PATCH
 router.patch('/update-news-info/:id', upload.array('images'), newsController.updateNewsInfo); // id points to news id

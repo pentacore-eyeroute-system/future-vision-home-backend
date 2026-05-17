@@ -30,6 +30,17 @@ export class NewsService {
         return news;
     };
 
+    async getAllTemporarilyDeletedNews() {
+        const temporarilyDeletedNews = await News.findAll({ 
+            where : {
+                news_is_temporarily_deleted: true,
+                deletedAt: null,
+            }, 
+        });
+
+        return temporarilyDeletedNews;
+    };
+
     async updateNewsInfo(news, newsData, transaction) {
         await news.update({
             news_title : newsData.title,

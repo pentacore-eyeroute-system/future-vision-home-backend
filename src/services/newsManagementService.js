@@ -89,6 +89,12 @@ export class NewsManagementService {
         return newsToSend;
     };
 
+    async getAllTemporarilyDeletedNews() {
+        const temporarilyDeletedNews = await newsService.getAllTemporarilyDeletedNews();
+
+        return temporarilyDeletedNews;
+    };
+
     async updateNewsInfo(newsId, newsData) {
         const transaction = await sequelize.transaction();
 

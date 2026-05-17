@@ -44,6 +44,23 @@ export class NewsController {
         }
     };
 
+    getAllTemporarilyDeletedNews = async (req, res) => {
+        try {
+            const result = await newsManagementService.getAllTemporarilyDeletedNews();
+
+            res.status(200).json({
+                success: true,
+                message: 'Temporarily deleted news retrieval success',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });                  
+        }
+    };
+
     updateNewsInfo = async (req, res) => {
         try {
             const newsId = req.params.id;
