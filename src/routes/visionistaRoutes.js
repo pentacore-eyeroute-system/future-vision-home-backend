@@ -14,6 +14,7 @@ router.post('/add-visionista', authenticateToken, upload.single('image'), vision
 
 // GET route
 router.get('/get-all-visionistas', authenticateToken, visionistaController.getAllVisionistas);
+router.get('/temporary-deleted-visionistas', authenticateToken, visionistaController.getAllTemporarilyDeletedVisionistas);
 
 // PATCH route
 router.patch('/update-visionista-info/:id', authenticateToken, upload.single('image'), visionistaController.updateVisionistaInfo);

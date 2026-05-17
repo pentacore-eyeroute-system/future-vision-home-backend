@@ -44,6 +44,23 @@ export class VisionistaController {
         }
     };
 
+    getAllTemporarilyDeletedVisionistas = async (req, res) => {
+        try {
+            const result = await visionistaManagementService.getAllTemporarilyDeletedVisionistas();
+
+            res.status(200).json({
+                success: true,
+                message: 'Temporarily deleted visionistas retrieval success',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });                  
+        }
+    };
+
     updateVisionistaInfo = async (req, res) => {
         try {
             const visionistaId = req.params.id;

@@ -53,6 +53,12 @@ export class VisionistaManagementService {
         return completeVisionistasInfo;
     };
 
+    async getAllTemporarilyDeletedVisionistas() {
+        const temporarilyDeletedVisionistas = await visionistaService.getAllTemporarilyDeletedVisionistas();
+
+        return temporarilyDeletedVisionistas;
+    };
+
     async updateVisionistaInfo(visionistaId, visionistaData) {
         let newFileKey = null;
         let oldFileKey = null;

@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Visionista } from "../models/visionistaModel.js";
 
 export class VisionistaService {
@@ -7,8 +8,7 @@ export class VisionistaService {
             vis_age : visionistaData.age,
             vis_story : visionistaData.story,
             vis_pic_path : visionistaData.fileKey,
-            vis_isArchived : false,
-            vis_isTemporarilyDeleted: false,
+            vis_is_temporarily_deleted: false,
         }, {
             transaction
         });
@@ -32,6 +32,17 @@ export class VisionistaService {
         return visionista;
     };
 
+    async getAllTemporarilyDeletedVisionistas() {
+        const temporarilyDeletedVisionistas = await Visionista.findAll({ 
+            where : {
+                vis_is_temporarily_deleted: true,
+                deletedAt: null,
+            }, 
+        });
+
+        return temporarilyDeletedVisionistas;
+    };
+
     async updateVisionistaInfo(visionista, visionistaData, transaction) {
         await visionista.update({
             vis_fullname : visionistaData.fullname,
@@ -53,7 +64,7 @@ export class VisionistaService {
         }
 
         await visionista.update({
-            vis_isTemporarilyDeleted: isTemporarilyDeleted,
+            vis_is_temporarily_deleted: isTemporarilyDeleted,
         });
 
         return visionista;
