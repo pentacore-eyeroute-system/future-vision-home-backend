@@ -20,12 +20,7 @@ export const Visionista = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        vis_isArchived: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        vis_isTemporarilyDeleted: {
+        vis_is_temporarily_deleted: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
