@@ -1,13 +1,13 @@
-import { AuthService } from "../services/authService.js";
+import { AdminAuthService } from "../services/adminAuthService.js";
 
-const authService = new AuthService();
+const adminAuthService = new AdminAuthService();
 
-export class AuthController {
+export class AdminAuthController {
     login = async (req, res) => {
         try {
             const { username, password } = req.body;
 
-            const result = await authService.login(username, password);
+            const result = await adminAuthService.login(username, password);
 
             res.status(200).json({
                 success : true,
