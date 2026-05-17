@@ -14,6 +14,7 @@ router.post('/create-gallery', authenticateToken, upload.array('images'), galler
 
 // GET route
 router.get('/get-all-galleries', authenticateToken, galleryController.getAllGalleries);
+router.get('/temporary-deleted-galleries', authenticateToken, galleryController.getAllTemporarilyDeletedGalleries);
 
 // PATCH
 router.patch('/update-gallery-info/:id', upload.array('images'), galleryController.updateGalleryInfo); // id points to news id

@@ -44,6 +44,23 @@ export class GalleryController {
         }
     };
 
+    getAllTemporarilyDeletedGalleries = async (req, res) => {
+        try {
+            const result = await galleryManagementService.getAllTemporarilyDeletedGalleries();
+
+            res.status(200).json({
+                success: true,
+                message: 'Temporarily deleted galleries retrieval success',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });                  
+        }
+    };
+
     updateGalleryInfo = async (req, res) => {
         try {
             const galleryId = req.params.id;

@@ -26,6 +26,17 @@ export class GalleryService {
         return gallery;
     };
 
+    async getAllTemporarilyDeletedGalleries() {
+        const temporarilyDeletedGalleries = await Gallery.findAll({ 
+            where : {
+                gal_is_temporarily_deleted: true,
+                deletedAt: null,
+            }, 
+        });
+
+        return temporarilyDeletedGalleries;
+    };
+
     async updateGalleryInfo(gallery, galleryData, transaction) {
         await gallery.update({
             gal_title : galleryData.title,

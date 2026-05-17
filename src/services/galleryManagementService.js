@@ -89,6 +89,12 @@ export class GalleryManagementService {
         return galleriesToSend;
     };
 
+    async getAllTemporarilyDeletedGalleries() {
+        const temporarilyDeletedGalleries = await galleryService.getAllTemporarilyDeletedGalleries();
+
+        return temporarilyDeletedGalleries;
+    };
+
     async updateGalleryInfo(galleryId, galleryData) {
         const transaction = await sequelize.transaction();
 
