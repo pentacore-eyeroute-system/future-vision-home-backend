@@ -18,7 +18,7 @@ export class PartnerService {
     };
 
     async getAllTemporarilyDeletedPartners() {
-        const temporarilyDeletedPartners = await Visionista.findAll({ 
+        const temporarilyDeletedPartners = await Partner.findAll({ 
             where : {
                 par_is_temporarily_deleted: true,
                 deletedAt: null,
