@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/env.js';
 
-const ADMIN_SECRET_KEY = config.adminSecretKey;
+const SECRET_KEY = config.secretKey;
 
 export function authenticateToken(req, res, next) {
     try {
@@ -11,7 +11,7 @@ export function authenticateToken(req, res, next) {
 
         const token = authorizationHeader.split(' ')[1];
 
-        const payload = jwt.verify(token, ADMIN_SECRET_KEY);
+        const payload = jwt.verify(token, SECRET_KEY);
 
         req.user = payload;
 

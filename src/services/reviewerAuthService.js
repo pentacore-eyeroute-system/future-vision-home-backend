@@ -25,13 +25,13 @@ export class ReviewerAuthService {
         const token = await tokenService.generateJwt(payload);
 
         return {
-            token: token,
             user: {
                 id: user.id,
                 fullname: user.usr_fullname,
                 email: user.usr_email,
                 picture: user.usr_pic_url,
                 role: user.usr_role,
+                token: token,
             },
         };
     };
