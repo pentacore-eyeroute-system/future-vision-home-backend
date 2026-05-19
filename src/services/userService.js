@@ -31,9 +31,19 @@ export class UserService {
     };
 
     async findByGoogleSub(googleSub) {
-        const reviewer = await User.findOne({ where : { usr_google_sub : googleSub } });
+        const user = await User.findOne({ where : { usr_google_sub : googleSub } });
 
-        return reviewer;
+        return user;
+    };
+
+    async findById(userId, transaction) {
+        const user = await User.findByPk(userId, { transaction });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return user;
     };
 
     async updateUser(user, userData) {

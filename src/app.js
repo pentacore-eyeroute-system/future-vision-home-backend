@@ -6,6 +6,8 @@ import partnerRoutes from './routes/partnerRoutes.js';
 import newsRoutes from './routes/newsRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js'
 import reviewerAuthRoutes from './routes/reviewerAuthRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import './models/associateModels.js';
 
 const app = express();
 
@@ -22,5 +24,6 @@ app.use('/api/visionistas', visionistaRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/review', reviewRoutes);
 
 export default app;
