@@ -13,7 +13,7 @@ const upload = multer({ storage });
 router.post('/create-news', authenticateToken, upload.array('images'), newsController.createNews);
 
 // GET route
-router.get('/get-all-news', authenticateToken, newsController.getAllNews);
+router.get('/get-all-news', newsController.getAllNews);
 router.get('/temporary-deleted-news', authenticateToken, newsController.getAllTemporarilyDeletedNews);
 
 // PATCH

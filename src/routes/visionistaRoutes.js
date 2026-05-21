@@ -13,7 +13,7 @@ const upload = multer({ storage });
 router.post('/add-visionista', authenticateToken, upload.single('image'), visionistaController.addVisionista);
 
 // GET route
-router.get('/get-all-visionistas', authenticateToken, visionistaController.getAllVisionistas);
+router.get('/get-all-visionistas', visionistaController.getAllVisionistas);
 router.get('/temporary-deleted-visionistas', authenticateToken, visionistaController.getAllTemporarilyDeletedVisionistas);
 
 // PATCH route

@@ -15,7 +15,7 @@ export class GalleryService {
     };
 
     async getAllGalleries() {
-        const gallery = await Gallery.findAll();
+        const gallery = await Gallery.findAll({ where: { gal_is_temporarily_deleted: false } });
 
         return gallery;
     };
