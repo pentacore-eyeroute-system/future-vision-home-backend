@@ -92,7 +92,10 @@ export class NewsManagementService {
     async getAllTemporarilyDeletedNews() {
         const temporarilyDeletedNews = await newsService.getAllTemporarilyDeletedNews();
 
-        return temporarilyDeletedNews;
+        return temporarilyDeletedNews.map(news => ({
+            ...news.toJSON(),
+            type: 'news'
+        }));
     };
 
     async updateNewsInfo(newsId, newsData) {

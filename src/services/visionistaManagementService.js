@@ -56,7 +56,10 @@ export class VisionistaManagementService {
     async getAllTemporarilyDeletedVisionistas() {
         const temporarilyDeletedVisionistas = await visionistaService.getAllTemporarilyDeletedVisionistas();
 
-        return temporarilyDeletedVisionistas;
+        return temporarilyDeletedVisionistas.map(visionista => ({
+            ...visionista.toJSON(),
+            type: 'visionista'
+        }));
     };
 
     async updateVisionistaInfo(visionistaId, visionistaData) {

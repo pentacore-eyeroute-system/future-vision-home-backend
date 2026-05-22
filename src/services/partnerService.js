@@ -25,7 +25,10 @@ export class PartnerService {
             }, 
         });
 
-        return temporarilyDeletedPartners;
+        return temporarilyDeletedPartners.map(partner => ({
+            ...partner.toJSON(),
+            type: 'partner'
+        }));
     };
 
     async updatePartnerInfo(partnerId, partnerData) {

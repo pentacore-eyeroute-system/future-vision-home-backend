@@ -92,7 +92,10 @@ export class GalleryManagementService {
     async getAllTemporarilyDeletedGalleries() {
         const temporarilyDeletedGalleries = await galleryService.getAllTemporarilyDeletedGalleries();
 
-        return temporarilyDeletedGalleries;
+        return temporarilyDeletedGalleries.map(gallery => ({
+            ...gallery.toJSON(),
+            type: 'gallery'
+        }));
     };
 
     async updateGalleryInfo(galleryId, galleryData) {
