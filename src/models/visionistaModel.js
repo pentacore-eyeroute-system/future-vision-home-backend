@@ -13,7 +13,7 @@ export const Visionista = sequelize.define(
             allowNull: false,            
         },
         vis_story: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         vis_pic_path: {
