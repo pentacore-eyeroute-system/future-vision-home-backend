@@ -6,8 +6,11 @@ export class AdminAuthController {
     login = async (req, res) => {
         try {
             const { username, password } = req.body;
+            const ip = req.ip
+                .replace('::ffff:', '')
+                .replace('::1', '127.0.0.1');
 
-            const result = await adminAuthService.login(username, password);
+            const result = await adminAuthService.login(ip, username, password);
 
             res.status(200).json({
                 success : true,
@@ -15,9 +18,10 @@ export class AdminAuthController {
                 result
             });
         } catch (err) {
-            res.status(401).json({
-                success : false,
-                error : err.message,
+            res.status(err.statusCode || 401).json({
+                success: false,
+                error: err.message,
+                retryAfter: err.retryAfter || null,
             });
         }
     };

@@ -16,14 +16,15 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.set('trust proxy', 1);
 
 //API routes
-app.use('/api/reviewer-auth/', reviewerAuthRoutes);
+app.use('/api/reviewer-auth', reviewerAuthRoutes);
 app.use('/api/auth', adminAuthRoutes);
 app.use('/api/visionistas', visionistaRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
-app.use('/api/review', reviewRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 export default app;

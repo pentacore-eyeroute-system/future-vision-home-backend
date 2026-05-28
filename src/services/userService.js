@@ -1,5 +1,8 @@
 import bcrypt from 'bcrypt';
 import { User } from '../models/userModel.js';
+import { LoginAttemptService } from './loginAttemptService.js';
+
+const loginAttemptService = new LoginAttemptService();
 
 export class UserService {
     async addUser(userData) {
@@ -14,18 +17,24 @@ export class UserService {
         return user;
     };
 
-    async findByUsername(username, password) {
+    async validateCredentials(record, ip, username, password) {
         const admin = await User.findOne({ where: { usr_username : username } });
 
         if (!admin) {
+            await loginAttemptService.onLoginFailed(record);
+
             throw new Error('Incorrect username or password');
         }
 
         const isMatch = await bcrypt.compare(password, admin.usr_password);
 
         if (!isMatch) {
+            await loginAttemptService.onLoginFailed(record);
+            
             throw new Error('Incorrect username or password');
         }
+
+        await loginAttemptService.onLoginSuccess(ip, username);
 
         return admin;
     };
