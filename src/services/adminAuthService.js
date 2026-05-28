@@ -29,7 +29,10 @@ export class AdminAuthService {
             // Generates JWT token for admin
             const token = await tokenService.generateJwt(payload);
 
-            return token;
+            return {
+                role: admin.usr_role,
+                token
+            };
         } catch (err) {
             // Re-checks block status AFTER a failed attempt
             const postFailBlockStatus = await loginAttemptService.checkIsBlocked(record);
