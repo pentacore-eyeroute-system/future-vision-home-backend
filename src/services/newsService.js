@@ -1,8 +1,24 @@
+import slugify from 'slugify';
 import { News } from "../models/newsModel.js";
 
 export class NewsService {
+    async generateSlug(newsTitle) {
+        const baseSlug = slugify(newsTitle, { lower: true, strict: true, trim: true });
+
+        let slug = baseSlug;
+        let count = 1;
+
+        while (await News.findOne({ where: { news_slug: slug } })) {
+            slug = `${baseSlug}-${count}`;
+            count++;
+        };
+
+        return slug;
+    };
+
     async createNews(newsData, transaction) {
         const news = await News.create({
+            news_slug : newsData.slug,
             news_title : newsData.title,
             news_description : newsData.description,
             news_date : newsData.date,

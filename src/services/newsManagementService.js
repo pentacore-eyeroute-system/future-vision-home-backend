@@ -13,6 +13,14 @@ export class NewsManagementService {
         const uploadedFileKeys = [];
 
         try {
+            // Generates slug for news
+            const slug = await newsService.generateSlug(newsData.title);
+
+            newsData = {
+                slug,
+                ...newsData,
+            };
+
             // Stores news info 
             const news = await newsService.createNews(newsData, transaction);
             

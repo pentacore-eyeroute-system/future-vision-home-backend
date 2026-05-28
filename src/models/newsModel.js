@@ -4,6 +4,11 @@ import { DataTypes } from 'sequelize';
 export const News = sequelize.define(
     'News', 
     {
+        news_slug: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
         news_title: {
             type: DataTypes.STRING,
             allowNull: false,
