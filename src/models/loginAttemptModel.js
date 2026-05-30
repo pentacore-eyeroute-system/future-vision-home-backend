@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize'
-import { sequelize } from '../config/db.js'
+import pkg from "sequelize";
+const { DataTypes } = pkg;
+import { sequelize } from "../config/db.js";
 
 export const LoginAttempt = sequelize.define(
-  'LoginAttempt',
+  "LoginAttempt",
   {
     log_ip: {
       type: DataTypes.STRING,
@@ -22,7 +23,7 @@ export const LoginAttempt = sequelize.define(
     },
   },
   {
-    tableName: 'login_attempts',
+    tableName: "login_attempts",
     timestamps: true,
-  }
-)
+  },
+);

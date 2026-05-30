@@ -30,8 +30,9 @@
     "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "mysql2": "^3.20.0",
-    "sequelize": "^6.37.8",
+    "mysql": "npm:mysql2@^3.22.4",
+    "mysql2": "^3.22.4",
+    "sequelize": "^3.30.0",
     "slugify": "^1.6.9",
     "uuid": "^13.0.0"
   },

@@ -1,34 +1,35 @@
-import { sequelize } from '../config/db.js';
-import { DataTypes } from 'sequelize';
+import { sequelize } from "../config/db.js";
+import pkg from "sequelize";
+const { DataTypes } = pkg;
 
 export const Visionista = sequelize.define(
-    'Visionista',
-    {
-        vis_fullname: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        vis_age: {
-            type: DataTypes.INTEGER,
-            allowNull: false,            
-        },
-        vis_story: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        vis_pic_path: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        vis_is_temporarily_deleted: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
+  "Visionista",
+  {
+    vis_fullname: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    {
-        tableName: 'visionistas',
-        timestamps: true,
-        paranoid: true,
-    }
+    vis_age: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    vis_story: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    vis_pic_path: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vis_is_temporarily_deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+  },
+  {
+    tableName: "visionistas",
+    timestamps: true,
+    paranoid: true,
+  },
 );

@@ -1,4 +1,5 @@
-import { Op } from "sequelize";
+import pkg from "sequelize";
+const { Op } = pkg;
 import { Visionista } from "../models/visionistaModel.js";
 
 export class VisionistaService {

@@ -1,5 +1,6 @@
 import { sequelize } from "../config/db.js";
-import { DataTypes } from "sequelize";
+import pkg from "sequelize";
+const { DataTypes } = pkg;
 
 export const Partner = sequelize.define(
     'Partner',

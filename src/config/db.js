@@ -1,20 +1,16 @@
-import { Sequelize } from 'sequelize';
+import pkg from 'sequelize';
+const { Sequelize } = pkg;
 import config from './env.js';
 
-const MYSQL_HOST = config.db.host;
-const MYSQL_PORT = config.db.port;
-const MYSQL_USER = config.db.user;
-const MYSQL_PASSWORD = config.db.password;
-const MYSQL_DATABASE = config.db.database;
-
 export const sequelize = new Sequelize(
-    MYSQL_DATABASE,
-    MYSQL_USER,
-    MYSQL_PASSWORD,    
+    config.db.database,
+    config.db.user,
+    config.db.password,
     {
-        dialect : 'mysql',
-        host    : MYSQL_HOST,
-        port    : MYSQL_PORT,
+        dialect: 'mysql',
+        host: config.db.host,
+        port: Number(config.db.port),
+        logging: false
     }
 );
 
@@ -22,10 +18,11 @@ export async function startDbConnection() {
     try {
         await sequelize.authenticate();
         console.log('Database connection successful');
-
         await sequelize.sync();
     } catch (err) {
-        console.log(`Database connection error: ${err}`);
+        console.error('\n --- DATABASE CONNECTION FAILED --- ');
+        console.error('The real underlying database error is:\n', err.message || err);
+        console.error('-----------------------------------------\n');
         process.exit(1);
     }
-};
+}

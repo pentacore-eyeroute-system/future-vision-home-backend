@@ -1,30 +1,31 @@
-import { sequelize } from '../config/db.js';
-import { DataTypes } from 'sequelize';
+import { sequelize } from "../config/db.js";
+import pkg from "sequelize";
+const { DataTypes } = pkg;
 
 export const Gallery = sequelize.define(
-    'Gallery', 
-    {
-        gal_title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        gal_description: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        gal_date: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
-        gal_is_temporarily_deleted: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
+  "Gallery",
+  {
+    gal_title: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    {
-        tableName: 'galleries',
-        timestamps: true,
-        paranoid: true,
-    }
+    gal_description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    gal_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    gal_is_temporarily_deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+  },
+  {
+    tableName: "galleries",
+    timestamps: true,
+    paranoid: true,
+  },
 );
