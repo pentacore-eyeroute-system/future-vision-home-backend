@@ -1,4 +1,3 @@
-import '../register-hooks.js';
 import app from './app.js';
 import config from './config/env.js';
 import { startDbConnection } from './config/db.js';
