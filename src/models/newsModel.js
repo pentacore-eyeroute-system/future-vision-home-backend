@@ -15,7 +15,7 @@ export const News = sequelize.define(
             allowNull: false,
         },
         news_description: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT('long'),
             allowNull: false,
         },
         news_date: {
