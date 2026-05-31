@@ -31,7 +31,7 @@ export class NewsService {
     };
 
     async getAllNews() {
-        const news = await News.findAll();
+        const news = await News.findAll({ where: { news_is_temporarily_deleted: false } });
 
         return news;
     };

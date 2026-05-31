@@ -18,7 +18,7 @@ export class VisionistaService {
     };
 
     async getAllVisionistas() {
-        const visionistas = await Visionista.findAll();
+        const visionistas = await Visionista.findAll({ where: { vis_is_temporarily_deleted: false } });
 
         return visionistas;
     };

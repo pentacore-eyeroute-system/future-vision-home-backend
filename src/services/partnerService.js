@@ -12,7 +12,7 @@ export class PartnerService {
     };
 
     async getAllPartners() {
-        const partner = await Partner.findAll();
+        const partner = await Partner.findAll({ where: { par_is_temporarily_deleted: false } });
 
         return partner;
     };
