@@ -68,8 +68,11 @@ export class VisionistaController {
                 fullname : req.body.fullname,
                 age : req.body.age,
                 story : req.body.story,  
-                file : req.file,
             };
+
+            if (req.file) {
+                visionistaData.file = req.file;
+            }
 
             const result = await visionistaManagementService.updateVisionistaInfo(visionistaId, visionistaData);
 

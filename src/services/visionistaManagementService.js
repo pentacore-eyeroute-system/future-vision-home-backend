@@ -74,12 +74,15 @@ export class VisionistaManagementService {
             // Retrieves existing file key in table
             oldFileKey = visionista.vis_pic_path;
 
-            // Uploads new picture in aws s3
-            newFileKey =  await awsService.uploadVisionistaPic(visionistaData.file);
+            // Checks if new file was sent
+            if (visionistaData.file) {
+                // Uploads the new picture
+                newFileKey = await awsService.uploadVisionistaPic(visionistaData.file);
 
-            visionistaData = {
-                ...visionistaData,
-                fileKey : newFileKey
+                visionistaData.fileKey = newFileKey;
+            } else {
+                // If no new file, keep the OLD path so it doesn't get overwritten with null
+                visionistaData.fileKey = oldFileKey;
             }
 
             // Updates visionista info in table
@@ -87,8 +90,8 @@ export class VisionistaManagementService {
 
             await transaction.commit();
 
-            // Deletes picture in aws s3
-            if (oldFileKey) {
+            // Deletes picture in aws s3 if new picture was sent and there is an existing picture to delete
+            if (visionistaData.file && oldFileKey) {
                 await awsService.hardDeleteVisionistaPic(oldFileKey);
             }
 
