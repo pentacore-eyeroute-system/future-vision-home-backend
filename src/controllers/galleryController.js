@@ -91,7 +91,6 @@ export class GalleryController {
         try {
             const galleryId = req.params.id;
             const isTemporarilyDeleted = req.body.isTemporarilyDeleted;
-
             const result = await galleryManagementService.updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted);
 
             res.status(200).json({

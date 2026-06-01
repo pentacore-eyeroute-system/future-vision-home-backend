@@ -23,4 +23,4 @@ router.patch('/temporary-delete-gallery/:id', authenticateToken, galleryControll
 // "DELETE" route (soft delete)
 router.put('/soft-delete-gallery/:id', authenticateToken, galleryController.softDeleteGallery); // id points to gallery id
 
-export default router;  
+export default router;
