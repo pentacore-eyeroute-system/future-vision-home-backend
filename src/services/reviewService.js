@@ -42,9 +42,40 @@ export class ReviewService {
         return reviews;
     };
 
-    async softDeleteReview(reviewId, transaction) {
-        const review = await Review.findByPk(reviewId);
+    async softDeleteReview(reviewId, reviewerId, transaction) {
+        const review = await Review.findOne({
+            where: {
+                id: reviewId,
+                rev_linked_reviewer_id: reviewerId,
+            },
+            transaction,
+        });
+
+        if (!review) {
+            throw new Error('Review not found');
+        }
         
         await review.destroy({ transaction });
+    };
+
+    async updateReview(reviewId, reviewData, reviewerId, transaction) {
+        const review = await Review.findOne({
+            where: {
+                id: reviewId,
+                rev_linked_reviewer_id: reviewerId,
+            },
+            transaction,
+        });
+
+        if (!review) {
+            throw new Error('Review not found');
+        }
+
+        await review.update({
+            rev_rating: reviewData.rating,
+            rev_feedback: reviewData.feedback,
+        }, { transaction });
+
+        return review;
     };
 } 

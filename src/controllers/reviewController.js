@@ -47,11 +47,35 @@ export class ReviewController {
         try {
             const reviewId = req.params.id;
 
-            const result = await reviewManagementService.softDeleteReview(reviewId);
+            const result = await reviewManagementService.softDeleteReview(reviewId, req.user.id);
 
             res.status(200).json({
                 success: true,
                 message: 'EyeRoute reviews soft delete successful',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        };
+    }
+
+    updateReview = async (req, res) => {
+        try {
+            const reviewId = req.params.id;
+            const reviewData = {
+                linkedReviewerId: req.user.id,
+                rating: req.body.rating,
+                feedback: req.body.feedback
+            };
+
+            const result = await reviewManagementService.updateReview(reviewId, reviewData);
+
+            res.status(200).json({
+                success: true,
+                message: 'EyeRoute review update successful',
                 result
             });
         } catch (err) {
