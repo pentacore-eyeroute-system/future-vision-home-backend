@@ -17,7 +17,7 @@ router.get('/get-all-news', newsController.getAllNews);
 router.get('/temporary-deleted-news', authenticateToken, newsController.getAllTemporarilyDeletedNews);
 
 // PATCH
-router.patch('/update-news-info/:id', upload.array('images'), newsController.updateNewsInfo); // id points to news id
+router.patch('/update-news-info/:id', authenticateToken, upload.array('images'), newsController.updateNewsInfo); // id points to news id
 router.patch('/temporary-delete-news/:id', authenticateToken, newsController.updateIsTemporarilyDeletedStatus); // id points to news id
 
 // "DELETE" route (soft delete)

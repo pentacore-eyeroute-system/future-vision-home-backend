@@ -11,6 +11,9 @@ router.post('/add-review', authenticateToken, reviewController.addReview);
 // GET route
 router.get('/get-reviews', reviewController.getAllReviews);
 
+// PATCH route
+router.patch('/update-review/:id', authenticateToken, reviewController.updateReview);
+
 // "DELETE" route
 router.put('/soft-delete-review/:id', authenticateToken, reviewController.softDeleteReview); // id points to review id
 

@@ -3,16 +3,32 @@ import { User } from "../models/userModel.js";
 
 export class ReviewService {
     async addReview(reviewData, transaction) {
-        const [review, isCreated] = await Review.upsert(
-        {
+        const existingReview = await Review.findOne({
+            where: {
+                rev_linked_reviewer_id: reviewData.linkedReviewerId
+            },
+            paranoid: false,
+            transaction
+        });
+
+        if (existingReview) {
+            if (existingReview.deletedAt) {
+                await existingReview.restore({ transaction });
+            }
+
+            await existingReview.update({
+                rev_rating: reviewData.rating,
+                rev_feedback: reviewData.feedback,                
+            }, { transaction });
+            
+            return existingReview;
+        }
+
+        return await Review.create({
             rev_linked_reviewer_id: reviewData.linkedReviewerId,
             rev_rating: reviewData.rating,
             rev_feedback: reviewData.feedback,
-        },
-        { transaction }
-        );
-
-        return review;
+        }, { transaction });
     };
 
     async getAllReviews() {
@@ -26,9 +42,40 @@ export class ReviewService {
         return reviews;
     };
 
-    async softDeleteReview(reviewId, transaction) {
-        const review = await Review.findByPk(reviewId);
+    async softDeleteReview(reviewId, reviewerId, transaction) {
+        const review = await Review.findOne({
+            where: {
+                id: reviewId,
+                rev_linked_reviewer_id: reviewerId,
+            },
+            transaction,
+        });
+
+        if (!review) {
+            throw new Error('Review not found');
+        }
         
         await review.destroy({ transaction });
+    };
+
+    async updateReview(reviewId, reviewData, reviewerId, transaction) {
+        const review = await Review.findOne({
+            where: {
+                id: reviewId,
+                rev_linked_reviewer_id: reviewerId,
+            },
+            transaction,
+        });
+
+        if (!review) {
+            throw new Error('Review not found');
+        }
+
+        await review.update({
+            rev_rating: reviewData.rating,
+            rev_feedback: reviewData.feedback,
+        }, { transaction });
+
+        return review;
     };
 } 

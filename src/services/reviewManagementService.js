@@ -44,13 +44,34 @@ export class ReviewManagementService {
         }));
     };
 
-    async softDeleteReview(reviewId) {
+    async softDeleteReview(reviewId, reviewerId) {
         const transaction = await sequelize.transaction();
 
         try {
-            await reviewService.softDeleteReview(reviewId, transaction);
+            await reviewService.softDeleteReview(reviewId, reviewerId, transaction);
 
             await transaction.commit()
+        } catch (err) {
+            await transaction.rollback();
+
+            throw err;
+        }
+    };
+
+    async updateReview(reviewId, reviewData) {
+        const transaction = await sequelize.transaction();
+
+        try {
+            const review = await reviewService.updateReview(
+                reviewId,
+                reviewData,
+                reviewData.linkedReviewerId,
+                transaction,
+            );
+
+            await transaction.commit();
+
+            return review;
         } catch (err) {
             await transaction.rollback();
 
