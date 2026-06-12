@@ -65,34 +65,28 @@ export class NewsManagementService {
         // Retrieves all news 
         const allNews = await newsService.getAllNews();
 
-        const newsToSend = [];
+        const newsToSend = await Promise.all(
+            // Loops through all news
+            allNews.map(async (news) => {
+                const pictures = await Promise.all(
+                    // Retrieves all picture path or file key associated to individual news
+                    news.NewsPictures.map(async (picture) => {
+                        // Retrieves picture url from aws s3
+                        const presignedUrl = await awsService.getNewsPic(picture.npi_pic_path);
 
-        // Loops through all news
-        for (let i = 0; i < allNews.length; i++) {
-            const news = allNews[i];
-            const newsPicturesToSend = [];
+                        return {
+                            ...picture.toJSON(),
+                            npi_pic_url : presignedUrl,
+                        }
+                    })
+                )
 
-            // Retrieves all picture path or file key associated to individual news
-            const newsPictures = await newsPicturesService.getAllPicturesByNews(news.id);
-
-            // Loops through all pictures
-            for (let j = 0; j < newsPictures.length; j++) {
-                const newsPicture = newsPictures[j];
-                
-                // Retrieves picture url from aws s3
-                const presignedUrl = await awsService.getNewsPic(newsPicture.npi_pic_path);
-
-                newsPicturesToSend.push({
-                    ...newsPicture.toJSON(),
-                    npi_pic_url : presignedUrl
-                });
-            };
-
-            newsToSend.push({
-                ...news.toJSON(),
-                newsPictures: newsPicturesToSend,
-            });
-        };
+                return {
+                    ...news.toJSON(),
+                    newsPictures: pictures,
+                }
+            })
+        );
 
         return newsToSend;
     };
