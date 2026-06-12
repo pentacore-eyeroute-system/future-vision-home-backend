@@ -57,34 +57,28 @@ export class GalleryManagementService {
         // Retrieves all galleries 
         const allGalleries = await galleryService.getAllGalleries();
 
-        const galleriesToSend = [];
+        const galleriesToSend = await Promise.all(
+            // Loops through all galleries
+            allGalleries.map(async (gallery) => {
+                const pictures = await Promise.all(
+                    // Retrieves all picture path or file key associated to individual gallery
+                    gallery.GalleryPictures.map(async (picture) => {
+                        // Retrieves picture url from aws s3
+                        const presignedUrl = await awsService.getGalleryPic(picture.gpi_pic_path);
 
-        // Loops through all galleries
-        for (let i = 0; i < allGalleries.length; i++) {
-            const gallery = allGalleries[i];
-            const galleryPicturesToSend = [];
+                        return {
+                            ...picture.toJSON(),
+                            gpi_pic_url : presignedUrl
+                        };
+                    })
+                )
 
-            // Retrieves all picture path or file key associated to individual gallery
-            const galleryPictures = await galleryPictureService.getAllPicturesByGallery(gallery.id);
-
-            // Loops through all pictures
-            for (let j = 0; j < galleryPictures.length; j++) {
-                const galleryPicture = galleryPictures[j];
-                
-                // Retrieves picture url from aws s3
-                const presignedUrl = await awsService.getGalleryPic(galleryPicture.gpi_pic_path);
-
-                galleryPicturesToSend.push({
-                    ...galleryPicture.toJSON(),
-                    gpi_pic_url : presignedUrl
-                });
-            };
-
-            galleriesToSend.push({
-                ...gallery.toJSON(),
-                galleryPictures: galleryPicturesToSend,
-            });
-        };
+                return {
+                    ...gallery.toJSON(),
+                    galleryPictures: pictures,
+                }            
+            })
+        );
 
         return galleriesToSend;
     };
