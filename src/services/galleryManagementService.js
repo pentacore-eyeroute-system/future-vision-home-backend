@@ -53,13 +53,13 @@ export class GalleryManagementService {
         }
     };
 
-    async getAllGalleries() {
-        // Retrieves all galleries 
-        const allGalleries = await galleryService.getAllGalleries();
+    async getAllGalleries(pagination) {
+        // Retrieves one page of galleries plus the unpaginated total
+        const { rows, count } = await galleryService.getAllGalleries(pagination);
 
         const galleriesToSend = await Promise.all(
             // Loops through all galleries
-            allGalleries.map(async (gallery) => {
+            rows.map(async (gallery) => {
                 const pictures = await Promise.all(
                     // Retrieves all picture path or file key associated to individual gallery
                     gallery.GalleryPictures.map(async (picture) => {
@@ -80,16 +80,18 @@ export class GalleryManagementService {
             })
         );
 
-        return galleriesToSend;
+        return { items: galleriesToSend, total: count };
     };
 
-    async getAllTemporarilyDeletedGalleries() {
-        const temporarilyDeletedGalleries = await galleryService.getAllTemporarilyDeletedGalleries();
+    async getAllTemporarilyDeletedGalleries(pagination) {
+        const { rows, count } = await galleryService.getAllTemporarilyDeletedGalleries(pagination);
 
-        return temporarilyDeletedGalleries.map(gallery => ({
+        const items = rows.map(gallery => ({
             ...gallery.toJSON(),
             type: 'gallery'
         }));
+
+        return { items, total: count };
     };
 
     async updateGalleryInfo(galleryId, galleryData) {

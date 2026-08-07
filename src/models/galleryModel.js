@@ -27,5 +27,13 @@ export const Gallery = sequelize.define(
     tableName: "galleries",
     timestamps: true,
     paranoid: true,
+    indexes: [
+      {
+        // Backs the paginated list queries: filter on the two delete flags,
+        // then sort by gal_date.
+        name: "galleries_list_idx",
+        fields: ["gal_is_temporarily_deleted", "deletedAt", "gal_date"],
+      },
+    ],
   },
 );

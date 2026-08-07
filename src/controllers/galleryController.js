@@ -1,4 +1,5 @@
 import { GalleryManagementService } from "../services/galleryManagementService.js";
+import { parsePagination, buildPaginationMeta } from "../utils/pagination.js";
 
 const galleryManagementService = new GalleryManagementService();
 
@@ -37,13 +38,16 @@ export class GalleryController {
 
     getAllGalleries = async (req, res) => {
         try {
-            const result = await galleryManagementService.getAllGalleries();
+            const pagination = parsePagination(req.query);
+
+            const { items, total } = await galleryManagementService.getAllGalleries(pagination);
 
             res.status(200).json({
                 success: true,
                 message: 'Gallery retrieval successful',
-                result
-            });    
+                result: items,
+                pagination: buildPaginationMeta(pagination, total),
+            });
         } catch (err) {
             res.status(500).json({
                 success: false,
@@ -54,12 +58,15 @@ export class GalleryController {
 
     getAllTemporarilyDeletedGalleries = async (req, res) => {
         try {
-            const result = await galleryManagementService.getAllTemporarilyDeletedGalleries();
+            const pagination = parsePagination(req.query);
+
+            const { items, total } = await galleryManagementService.getAllTemporarilyDeletedGalleries(pagination);
 
             res.status(200).json({
                 success: true,
                 message: 'Temporarily deleted galleries retrieval success',
-                result
+                result: items,
+                pagination: buildPaginationMeta(pagination, total),
             });
         } catch (err) {
             res.status(500).json({

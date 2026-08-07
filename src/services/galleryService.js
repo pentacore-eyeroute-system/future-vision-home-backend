@@ -1,6 +1,10 @@
 import { Gallery } from "../models/galleryModel.js";
 import { GalleryPicture } from "../models/galleryPictureModel.js";
 
+// Deterministic ordering: gal_date is not unique, so id breaks ties and keeps
+// pages stable across requests.
+const LIST_ORDER = [['gal_date', 'DESC'], ['id', 'DESC']];
+
 export class GalleryService {
     async createGallery(galleryData, transaction) {
         const gallery = await Gallery.create({
@@ -15,19 +19,24 @@ export class GalleryService {
         return gallery;
     };
 
-    async getAllGalleries() {
-        const gallery = await Gallery.findAll(
-            { 
+    async getAllGalleries({ limit, offset }) {
+        // distinct: true so the hasMany join does not inflate the count
+        const { rows, count } = await Gallery.findAndCountAll(
+            {
                 where: { gal_is_temporarily_deleted: false },
                 include: [
                     {
                         model: GalleryPicture
                     }
-                ]
+                ],
+                order: LIST_ORDER,
+                limit,
+                offset,
+                distinct: true,
             }
         );
 
-        return gallery;
+        return { rows, count };
     };
 
     async findById(galleryId, transaction) {
@@ -36,15 +45,18 @@ export class GalleryService {
         return gallery;
     };
 
-    async getAllTemporarilyDeletedGalleries() {
-        const temporarilyDeletedGalleries = await Gallery.findAll({ 
+    async getAllTemporarilyDeletedGalleries({ limit, offset }) {
+        const { rows, count } = await Gallery.findAndCountAll({
             where : {
                 gal_is_temporarily_deleted: true,
                 deletedAt: null,
-            }, 
+            },
+            order: LIST_ORDER,
+            limit,
+            offset,
         });
 
-        return temporarilyDeletedGalleries;
+        return { rows, count };
     };
 
     async updateGalleryInfo(gallery, galleryData, transaction) {
