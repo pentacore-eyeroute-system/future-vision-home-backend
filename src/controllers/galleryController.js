@@ -27,6 +27,14 @@ export class GalleryController {
         }
     };
 
+    getGalleries = async (req, res) => {
+        if (req.query['temporarily-deleted'] === 'true') {
+            return this.getAllTemporarilyDeletedGalleries(req, res);
+        }
+
+        return this.getAllGalleries(req, res);
+    };
+
     getAllGalleries = async (req, res) => {
         try {
             const result = await galleryManagementService.getAllGalleries();

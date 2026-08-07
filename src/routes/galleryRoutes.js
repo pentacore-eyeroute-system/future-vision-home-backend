@@ -9,12 +9,19 @@ const galleryController = new GalleryController();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// The public collection view is open; the temporarily-deleted filter is admin-only
+const authenticateWhenTemporarilyDeleted = (req, res, next) => {
+    if (req.query['temporarily-deleted'] === 'true') return authenticateToken(req, res, next);
+
+    next();
+};
+
 // POST route
 router.post('/create-gallery', authenticateToken, upload.array('images'), galleryController.createGallery);
 
 // GET route
+router.get('/', authenticateWhenTemporarilyDeleted, galleryController.getGalleries); // ?temporarily-deleted=true filters to the recycle bin
 router.get('/get-all-galleries', galleryController.getAllGalleries);
-router.get('/temporary-deleted-galleries', authenticateToken, galleryController.getAllTemporarilyDeletedGalleries);
 
 // PATCH
 router.patch('/update-gallery-info/:id', authenticateToken, upload.array('images'), galleryController.updateGalleryInfo); // id points to gallery id

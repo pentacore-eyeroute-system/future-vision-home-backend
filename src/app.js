@@ -24,7 +24,7 @@ app.use('/api/auth', adminAuthRoutes);
 app.use('/api/visionistas', visionistaRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/news', newsRoutes);
-app.use('/api/gallery', galleryRoutes);
+app.use('/api/galleries', galleryRoutes);
 app.use('/api/reviews', reviewRoutes);
 
 export default app;
