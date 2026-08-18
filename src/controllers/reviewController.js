@@ -47,6 +47,13 @@ export class ReviewController {
         try {
             const reviewId = req.params.id;
 
+            if (req.user.role !== 'reviewer') {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: You do not have access'
+                });
+                }
+
             const result = await reviewManagementService.softDeleteReview(reviewId, req.user.id);
 
             res.status(200).json({
@@ -55,7 +62,7 @@ export class ReviewController {
                 result
             });
         } catch (err) {
-            res.status(500).json({
+            res.status(err.statusCode || 500).json({
                 success: false,
                 error: err.message,
             });

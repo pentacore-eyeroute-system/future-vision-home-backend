@@ -43,16 +43,17 @@ export class ReviewService {
     };
 
     async softDeleteReview(reviewId, reviewerId, transaction) {
-        const review = await Review.findOne({
-            where: {
-                id: reviewId,
-                rev_linked_reviewer_id: reviewerId,
-            },
-            transaction,
-        });
+        const review = await Review.findByPk(reviewId, { transaction });
 
         if (!review) {
-            throw new Error('Review not found');
+            const error = new Error('Review not found');
+            error.statusCode = 404;
+            throw error;
+        }
+        if (review.rev_linked_reviewer_id !== reviewerId){
+            const error = new Error('Forbidden: Not allowed to delete others review');
+            error.statusCode = 403;
+            throw error;
         }
         
         await review.destroy({ transaction });
