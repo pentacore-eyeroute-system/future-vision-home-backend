@@ -31,4 +31,13 @@ export class UserApplicationService {
 
         return userApplication;
     };
+
+    async getAllPendingUserApplications() {
+        const userApplications = await UserApplication.findAll({
+            where: { apl_status : 'pending' },
+            attributes: ['id', 'apl_fullname', 'apl_email', 'apl_username', 'createdAt']
+        });
+
+        return userApplications;
+    };
 }
