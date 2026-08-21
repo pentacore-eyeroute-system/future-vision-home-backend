@@ -77,7 +77,7 @@ export class AdminAuthService {
             const token = tokenService.generateJwt(payload);
 
             return {
-                role: user.usr_role,
+                user,
                 token
             };
         } catch (err) {

@@ -31,15 +31,15 @@ export class UserService {
     };
 
     async validateCredentials(record, ip, username, password) {
-        const admin = await User.findOne({ where: { usr_username : username } });
+        const user = await User.findOne({ where: { usr_username : username } });
 
-        if (!admin) {
+        if (!user) {
             await loginAttemptService.onLoginFailed(record);
 
             throw new Error('Incorrect username or password');
         }
 
-        const isMatch = await bcrypt.compare(password, admin.usr_password);
+        const isMatch = await bcrypt.compare(password, user.usr_password);
 
         if (!isMatch) {
             await loginAttemptService.onLoginFailed(record);
@@ -49,7 +49,7 @@ export class UserService {
 
         await loginAttemptService.onLoginSuccess(ip, username);
 
-        return admin;
+        return user;
     };
 
     async findByGoogleSub(googleSub) {
