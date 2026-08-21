@@ -23,4 +23,12 @@ export class UserApplicationService {
             throw err;
         }
     };
+
+    async findByUsername(username) {
+        const userApplication = await UserApplication.findOne({
+            where : { apl_username : username }
+        });
+
+        return userApplication;
+    };
 }

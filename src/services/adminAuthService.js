@@ -27,6 +27,36 @@ export class AdminAuthService {
     async login(ip, username, password) {
         const record = await loginAttemptService.getRecord(ip, username);
 
+        // Finds user application
+        const userApplication = await userApplicationService.findByUsername(username);
+
+        if (!userApplication) {
+            throw new Error('Account not found. Please sign up first.')
+        }
+
+        // Rejects login if user application isn't approved
+        if (userApplication.apl_status !== "approved") {
+            if (userApplication.apl_status === "pending") {
+                throw new Error('Account not yet verified. Please check again later.');
+            }
+
+            if (userApplication.apl_status === "rejected") {
+                throw new Error('Account application was rejected.');
+            }
+        }
+        
+        // Finds the actual user record
+        const user = await userService.findByUsername(username);
+
+        if (!user) {
+            throw new Error('Account not found. Please sign up first.')
+        }
+
+        // Rejects login if user is disabled approved
+        if (user.usr_status === "disabled") {
+            throw new Error('Account has been suspended.')   
+        }
+
         // Checks if user is blocked from previous session
         const blockStatus = await loginAttemptService.checkIsBlocked(record);
 
@@ -35,19 +65,19 @@ export class AdminAuthService {
         }
 
         try {
-            // Finds matching admin
-            const admin = await userService.validateCredentials(record, ip, username, password);
+            // Finds matching user
+            const user = await userService.validateCredentials(record, ip, username, password);
 
             const payload = {
-                id: admin.id,
-                role: "admin"
+                id: user.id,
+                role: (user.usr_role === "admin") ? "admin" : "editor"
             };
 
             // Generates JWT token for admin
-            const token = await tokenService.generateJwt(payload);
+            const token = tokenService.generateJwt(payload);
 
             return {
-                role: admin.usr_role,
+                role: user.usr_role,
                 token
             };
         } catch (err) {

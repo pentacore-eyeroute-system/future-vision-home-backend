@@ -68,6 +68,14 @@ export class UserService {
         return user;
     };
 
+    async findByUsername(username) {
+        const user = await User.findOne({
+            where : { usr_username : username }
+        });
+
+        return user;
+    };
+
     async updateUser(user, userData) {
         const updatedUser = await user.update({
             usr_email: userData.email,
