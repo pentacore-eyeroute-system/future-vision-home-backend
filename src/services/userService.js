@@ -6,15 +6,28 @@ const loginAttemptService = new LoginAttemptService();
 
 export class UserService {
     async addUser(userData) {
-        const user = await User.create({
-            usr_email: userData.email,
-            usr_google_sub: userData.googleSub,
-            usr_fullname: userData.fullname,
-            usr_pic_url: userData.picture,
-            usr_role: userData.role,
-        });
+        try {
+            const user = await User.create({
+                usr_email: userData.email,
+                usr_google_sub: userData.googleSub,
+                usr_fullname: userData.fullname,
+                usr_username: userData.username,
+                usr_password: userData.password,
+                usr_pic_url: userData.picture,
+                usr_role: userData.role,
+            });
 
-        return user;
+            return {
+                id: user.id,
+                username: user.usr_username,
+            };
+        } catch (err) {
+            if (err.name === 'SequelizeUniqueConstraintError') {
+                throw new Error('Email is already used');
+            }
+
+            throw err;
+        }
     };
 
     async validateCredentials(record, ip, username, password) {

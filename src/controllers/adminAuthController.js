@@ -3,6 +3,37 @@ import { AdminAuthService } from "../services/adminAuthService.js";
 const adminAuthService = new AdminAuthService();
 
 export class AdminAuthController {
+    signup = async (req, res) => {
+        try {
+            let userData = {
+                fullname: req.body.fullname.trim(),
+                email: req.body.email.trim(),
+                username: req.body.username.trim(),
+                password: req.body.password.trim(),
+            };
+
+            const result = await adminAuthService.signup(userData);
+
+            res.status(201).json({
+                success : true,
+                message : 'Onboarding success',
+                result
+            });
+        } catch (err) {
+            if (err.message === 'Email is already used') {
+                return res.status(409).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        }
+    };
+
     login = async (req, res) => {
         try {
             const { username, password } = req.body;

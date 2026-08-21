@@ -33,10 +33,23 @@ export const User = sequelize.define(
       allowNull: true,
     },
     usr_role: {
-      type: DataTypes.ENUM("admin", "reviewer"),
+      type: DataTypes.ENUM("admin", "editor", "reviewer"),
       defaultValue: "reviewer",
       allowNull: false,
     },
+    usr_status: {
+      type: DataTypes.ENUM("active", "disabled"),
+      defaultValue: "active",
+      allowNull: true,
+    },
+    usr_linked_application_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'fvh_user_applications',
+        key: "id"
+      }
+    }
   },
   {
     tableName: "fvh_users",

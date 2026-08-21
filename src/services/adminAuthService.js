@@ -1,12 +1,29 @@
 import { UserService } from "./userService.js";
 import { LoginAttemptService } from './loginAttemptService.js';
 import { TokenService } from "./tokenService.js";
+import { AuthUtil } from '../utils/authUtil.js';
+import { UserApplicationService } from "./userApplicationService.js";
 
 const userService = new UserService();
 const loginAttemptService = new LoginAttemptService();
 const tokenService = new TokenService();
+const authUtil = new AuthUtil();
+const userApplicationService = new UserApplicationService();
 
-export class AdminAuthService {    
+export class AdminAuthService {
+    async signup(userData) {
+        const hashedPassword = await authUtil.hashPassword(userData.password);
+
+        userData = {
+            ...userData,
+            password : hashedPassword
+        }
+
+        const user = await userApplicationService.addApplication(userData);
+
+        return user;
+    };
+    
     async login(ip, username, password) {
         const record = await loginAttemptService.getRecord(ip, username);
 
