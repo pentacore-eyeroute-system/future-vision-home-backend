@@ -5,7 +5,7 @@ const reviewerAuthService = new ReviewerAuthService();
 export class ReviewerAuthController {
     login = async (req, res) => {
         try {
-            const userData = {
+            let userData = {
                 email: req.reviewer['email'],
                 googleSub: req.reviewer['sub'],
                 fullname: req.reviewer['name'],

@@ -11,7 +11,7 @@ export class UserService {
             usr_google_sub: userData.googleSub,
             usr_fullname: userData.fullname,
             usr_pic_url: userData.picture,
-            usr_role: "reviewer",
+            usr_role: userData.role,
         });
 
         return user;

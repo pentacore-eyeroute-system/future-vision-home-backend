@@ -11,6 +11,11 @@ export class ReviewerAuthService {
         user = await userService.findByGoogleSub(userData.googleSub);
 
         if (!user) {
+            userData = {
+                ...userData,
+                role : "reviewer",
+            }
+            
             user = await userService.addUser(userData);
         } else {
             user = await userService.updateUser(user, userData);
