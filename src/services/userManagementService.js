@@ -1,8 +1,10 @@
 import { UserApplicationService } from "./userApplicationService.js"
 import { UserService } from "./userService.js";
+import { EmailService } from "./emailService.js";
 
 const userApplicationService = new UserApplicationService();
 const userService = new UserService();
+const emailService = new EmailService();
 
 export class UserManagementService {
     async getAllPendingUserApplications() {
@@ -22,8 +24,13 @@ export class UserManagementService {
 
         const updatedUserApplication = await userApplicationService.updateStatus(userApplicationData);
 
-        if (updatedUserApplication.status === "rejected") {
-            return userApplication.id;
+        if (updatedUserApplication.apl_status === "rejected") {
+            await emailService.sendAccountRequestResult(userApplication.apl_email, updatedUserApplication.apl_status);
+
+            return {
+                id : userApplication.id,
+                username: userApplication.apl_username,
+            };
         }
 
         const userData = {
@@ -36,6 +43,8 @@ export class UserManagementService {
         };
 
         const user = await userService.addUser(userData);
+
+        await emailService.sendAccountRequestResult(userApplication.apl_email, updatedUserApplication.apl_status);
 
         return user;
     };

@@ -18,6 +18,11 @@ export default {
         s3BucketRegion: process.env.S3_BUCKET_REGION,
         s3BucketName: process.env.S3_BUCKET_NAME,
     },
+    ses: {
+        sesFromEmail: process.env.SES_FROM_EMAIL,
+        smtpUserName: process.env.SES_SMTP_USER_NAME,
+        smtpPassword: process.env.SES_SMTP_PASSWORD,
+    },
     google: {
         webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
     },
