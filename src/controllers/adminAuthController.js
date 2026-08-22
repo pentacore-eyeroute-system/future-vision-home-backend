@@ -60,7 +60,7 @@ export class AdminAuthController {
     updatePassword = async (req, res) => {
         try {
             let userData = {
-                id: req.params.id,
+                id: req.user.id,
                 password: req.body.password.trim(),
             };
 

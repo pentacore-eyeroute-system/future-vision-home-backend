@@ -10,6 +10,6 @@ router.post('/onboard', adminAuthController.signup);
 router.post('/login', adminAuthController.login);
 
 // PATCH route
-router.patch('/:id/password', authenticateToken, adminAuthController.updatePassword); // id points to user id
+router.patch('/password', authenticateToken, adminAuthController.updatePassword); // id points to user id
 
 export default router;
