@@ -8,6 +8,7 @@ export class UserService {
     async addUser(userData) {
         try {
             const user = await User.create({
+                usr_linked_application_id: userData.linkedApplicationId,
                 usr_email: userData.email,
                 usr_google_sub: userData.googleSub,
                 usr_fullname: userData.fullname,

@@ -8,4 +8,7 @@ const userManagementController = new UserManagementController();
 // GET route
 router.get('/pending-request', authenticateToken, userManagementController.getAllPendingUserApplications);
 
+// PATCH route
+router.patch('/pending-request/:id', authenticateToken, userManagementController.updatePendingUserApplication); // id points to user application id
+
 export default router;

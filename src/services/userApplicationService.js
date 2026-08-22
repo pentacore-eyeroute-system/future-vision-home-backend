@@ -32,6 +32,12 @@ export class UserApplicationService {
         return userApplication;
     };
 
+    async findById(userApplicationId) {
+        const userApplication = await UserApplication.findByPk(userApplicationId);
+
+        return userApplication;
+    };
+
     async getAllPendingUserApplications() {
         const userApplications = await UserApplication.findAll({
             where: { apl_status : 'pending' },
@@ -39,5 +45,16 @@ export class UserApplicationService {
         });
 
         return userApplications;
+    };
+
+    async updateStatus(userApplicationData) {
+        await UserApplication.update({ apl_status: userApplicationData.status }, { where: { id: userApplicationData.id }});
+
+        const userApplication = await UserApplication.findByPk(
+            userApplicationData.id,
+            { raw: true }
+        );
+
+        return userApplication;
     };
 }
