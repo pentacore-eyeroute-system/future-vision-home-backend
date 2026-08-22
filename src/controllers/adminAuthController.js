@@ -56,4 +56,25 @@ export class AdminAuthController {
             });
         }
     };
+
+    updatePassword = async (req, res) => {
+        try {
+            let userData = {
+                id: req.params.id,
+                password: req.body.password.trim(),
+            };
+
+            await adminAuthService.updatePassword(userData);
+
+            res.status(200).json({
+                success : true,
+                message : 'Update password success',
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        }
+    };
 }

@@ -3,6 +3,7 @@ import { LoginAttemptService } from './loginAttemptService.js';
 import { TokenService } from "./tokenService.js";
 import { AuthUtil } from '../utils/authUtil.js';
 import { UserApplicationService } from "./userApplicationService.js";
+import { sequelize } from '../config/db.js';
 
 const userService = new UserService();
 const loginAttemptService = new LoginAttemptService();
@@ -114,6 +115,36 @@ export class AdminAuthService {
 
         if (diffMinutes < 60) {
             return `Too many attempts. Try again in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}.`;
+        }
+    };
+
+    async updatePassword(userData) {
+        const transaction = await sequelize.transaction();
+
+        try {
+            const user = await userService.findById(userData.id, transaction);
+
+            const isMatch = await authUtil.comparePassword(userData.password, user.usr_password);
+
+            if (isMatch) {
+                throw new Error('New password cannot be the same as the current password');
+            }
+
+            const hashedPassword = await authUtil.hashPassword(userData.password);
+
+            await userService.updatePassword(
+                {
+                    ...userData,
+                    password: hashedPassword
+                },
+                transaction
+            );
+
+            await transaction.commit();
+        } catch (err) {
+            await transaction.rollback();
+
+            throw err;
         }
     };
 }

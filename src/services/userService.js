@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Op, where } from 'sequelize';
+import { Op} from 'sequelize';
 import { User } from '../models/userModel.js';
 import { LoginAttemptService } from './loginAttemptService.js';
 
@@ -153,5 +153,15 @@ export class UserService {
             usr_role : user.usr_role,
             usr_status: user.usr_status,
         }
+    };
+
+    async updatePassword(userData, transaction) {
+        await User.update(
+            { usr_password: userData.password },
+            {
+                where: { id: userData.id },
+                transaction
+            }
+        );
     };
 }
