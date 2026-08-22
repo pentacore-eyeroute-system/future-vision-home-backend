@@ -54,7 +54,7 @@ export class AdminAuthService {
 
         // Rejects login if user is disabled approved
         if (user.usr_status === "disabled") {
-            throw new Error('Account has been suspended.')   
+            throw new Error('Account has been disabled.')   
         }
 
         // Checks if user is blocked from previous session
