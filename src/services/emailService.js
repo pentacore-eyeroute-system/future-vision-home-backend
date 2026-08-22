@@ -32,4 +32,17 @@ export class EmailService {
 
         await transporter.sendMail(email);
     };
+
+    async sendRoleUpdate(recipientEmail, role) {
+        const { subject, text } = emailTemplate.roleUpdate(role);
+
+        const email = {
+            from: `Future Vision Home <${SES_FROM_EMAIL}>`,
+            to: recipientEmail,
+            subject: subject,
+            text: text
+        }
+
+        await transporter.sendMail(email);
+    };
 }

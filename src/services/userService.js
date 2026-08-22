@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Op } from 'sequelize';
+import { Op, where } from 'sequelize';
 import { User } from '../models/userModel.js';
 import { LoginAttemptService } from './loginAttemptService.js';
 
@@ -100,5 +100,29 @@ export class UserService {
         });
 
         return updatedUser;
+    };
+
+    async updateRole(userData) {
+        const user = await User.findByPk(userData.id);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (userData.role === user.usr_role) {
+            throw new Error("New role is the same as the current role");
+        }
+
+        await user.update({
+            usr_role: userData.role
+        });
+
+        return {
+            id : user.id, 
+            usr_fullname : user.usr_fullname, 
+            usr_email : user.usr_email, 
+            usr_username : user.usr_username, 
+            usr_role : user.usr_role
+        }
     };
 }

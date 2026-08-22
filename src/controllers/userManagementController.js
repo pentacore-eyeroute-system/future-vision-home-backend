@@ -58,4 +58,26 @@ export class UserManagementController {
             });
         };
     };
+
+    updateRole = async (req, res) => {
+        try {
+            const userData = {
+                id: req.params.id,
+                role: req.body.role.trim(),
+            }
+
+            const result = await userManagementService.updateRole(userData);
+
+            res.status(200).json({
+                success: true,
+                message: 'Staff member role update successful',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        };
+    }
 }

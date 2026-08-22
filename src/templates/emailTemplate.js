@@ -35,5 +35,24 @@ Best regards,
 Future Vision Home
             `
         };
+    };
+
+    roleUpdate(role) {
+        return {
+            subject : 'Your Account Role Has Been Updated',
+            text : `
+Hello,
+
+We’re writing to inform you that your account role has been changed to ${role}.
+
+Your account permissions have been updated accordingly. You may now access the features and functions available to your new role.
+
+If you believe this change was made in error, please contact the system administrator.
+
+Best regards,
+
+Future Vision Home
+            `
+        }
     }
 }

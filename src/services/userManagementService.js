@@ -54,4 +54,12 @@ export class UserManagementService {
 
         return user;
     };
+
+    async updateRole(userData) {
+        const updatedUser = await userService.updateRole(userData);
+
+        await emailService.sendRoleUpdate(updatedUser.usr_email, updatedUser.usr_role);
+
+        return updatedUser;
+    };
 }
