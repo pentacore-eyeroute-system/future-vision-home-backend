@@ -45,4 +45,17 @@ export class EmailService {
 
         await transporter.sendMail(email);
     };
+
+    async sendStatusUpdate(recipientEmail, status) {
+        const { subject, text } = emailTemplate.statusUpdate(status);
+
+        const email = {
+            from: `Future Vision Home <${SES_FROM_EMAIL}>`,
+            to: recipientEmail,
+            subject: subject,
+            text: text
+        }
+
+        await transporter.sendMail(email);
+    };
 }

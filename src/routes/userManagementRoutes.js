@@ -11,6 +11,7 @@ router.get('/staff-members', authenticateToken, userManagementController.getAllS
 
 // PATCH route
 router.patch('/pending-request/:id', authenticateToken, userManagementController.updatePendingUserApplication); // id points to user application id
-router.patch('/staff-members/:id', authenticateToken, userManagementController.updateRole); // id points to user id
+router.patch('/staff-members/:id/role', authenticateToken, userManagementController.updateRole); // id points to user id
+router.patch('/staff-members/:id/status', authenticateToken, userManagementController.updateStatus); // id points to user id
 
 export default router;

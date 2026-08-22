@@ -62,4 +62,20 @@ export class UserManagementService {
 
         return updatedUser;
     };
+
+    async updateStatus(userData) {
+        const ACTIVE_ADMINS_MINIUM_LENGTH = 2;
+
+        const activeAdminsLength = await userService.getNumberOfActiveAdmins();
+
+        if (activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
+            throw new Error('Cannot disable this admin. The minimum number of active admins must be maintained.');
+        }
+
+        const updatedUser = await userService.updateStatus(userData);
+
+        await emailService.sendStatusUpdate(updatedUser.usr_email, updatedUser.usr_status);
+
+        return updatedUser;
+    };
 }

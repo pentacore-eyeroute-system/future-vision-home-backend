@@ -80,4 +80,26 @@ export class UserManagementController {
             });
         };
     }
+
+    updateStatus = async (req, res) => {
+        try {
+            const userData = {
+                id: req.params.id,
+                status: req.body.status.trim(),
+            }
+
+            const result = await userManagementService.updateStatus(userData);
+
+            res.status(200).json({
+                success: true,
+                message: 'Staff member status update successful',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        };
+    }
 }

@@ -92,6 +92,14 @@ export class UserService {
         return staffMembers;
     };
 
+    async getNumberOfActiveAdmins() {
+        const admins = await User.findAll({
+            where : { 'usr_role' : 'admin' }  
+        });
+
+        return admins.length;
+    };
+
     async updateUser(user, userData) {
         const updatedUser = await user.update({
             usr_email: userData.email,
@@ -123,6 +131,27 @@ export class UserService {
             usr_email : user.usr_email, 
             usr_username : user.usr_username, 
             usr_role : user.usr_role
+        }
+    };
+
+    async updateStatus(userData) {
+        const user = await User.findByPk(userData.id);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        await user.update({
+            usr_status: userData.status
+        });
+
+        return {
+            id : user.id, 
+            usr_fullname : user.usr_fullname, 
+            usr_email : user.usr_email, 
+            usr_username : user.usr_username, 
+            usr_role : user.usr_role,
+            usr_status: user.usr_status,
         }
     };
 }

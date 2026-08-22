@@ -47,12 +47,31 @@ We’re writing to inform you that your account role has been changed to ${role}
 
 Your account permissions have been updated accordingly. You may now access the features and functions available to your new role.
 
-If you believe this change was made in error, please contact the system administrator.
+If you believe this change was made in error, please contact the Future Vision Home administrator.
 
 Best regards,
 
 Future Vision Home
             `
         }
-    }
+    };
+
+    statusUpdate(status) {
+        return {
+            subject : 'Your Account Status Has Been Updated',
+            text : `
+Hello,
+
+We’re writing to inform you that your account status has been changed to ${status}.
+
+You will no longer be able to access the system while your account is disabled. If you believe this change was made in error or need further assistance, please contact the system administrator.
+
+If you believe this change was made in error, please contact the Future Vision Home administrator.
+
+Best regards,
+
+Future Vision Home
+            `
+        }
+    };
 }
