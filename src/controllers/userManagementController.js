@@ -20,6 +20,23 @@ export class UserManagementController {
         };
     };
 
+    getAllStaffMembers = async (req, res) => {
+        try {
+            const result = await userManagementService.getAllStaffMembers();
+
+            res.status(200).json({
+                success: true,
+                message: 'Staff members retrieval successful',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        };
+    };
+
     updatePendingUserApplication = async (req, res) => {
         try {
             const userApplicationData = {

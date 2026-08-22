@@ -7,6 +7,7 @@ const userManagementController = new UserManagementController();
 
 // GET route
 router.get('/pending-request', authenticateToken, userManagementController.getAllPendingUserApplications);
+router.get('/staff-members', authenticateToken, userManagementController.getAllStaffMembers);
 
 // PATCH route
 router.patch('/pending-request/:id', authenticateToken, userManagementController.updatePendingUserApplication); // id points to user application id

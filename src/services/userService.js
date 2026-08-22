@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { Op } from 'sequelize';
 import { User } from '../models/userModel.js';
 import { LoginAttemptService } from './loginAttemptService.js';
 
@@ -75,6 +76,20 @@ export class UserService {
         });
 
         return user;
+    };
+
+    async getAllStaffMembers() {
+        const staffMembers = await User.findAll({
+            where: { 
+                usr_role : {
+                    [Op.in]: ['admin', 'editor']
+                },
+                usr_status : 'active' 
+            },
+            attributes: ['id', 'usr_fullname', 'usr_email', 'usr_username', 'usr_role']
+        });
+
+        return staffMembers;
     };
 
     async updateUser(user, userData) {

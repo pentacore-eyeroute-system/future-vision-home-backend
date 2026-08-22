@@ -13,6 +13,12 @@ export class UserManagementService {
         return userApplications;
     }
 
+    async getAllStaffMembers() {
+        const staffMembers = await userService.getAllStaffMembers();
+
+        return staffMembers;
+    };
+ 
     async updatePendingUserApplication(userApplicationData) {
         const userApplication = await userApplicationService.findById(userApplicationData.id);
 
