@@ -79,6 +79,7 @@ export class UserManagementService {
             await auditLogService.log({
                 actorUserId: actorId,
                 targetUserId: user.id,
+                targetApplicationId: userApplication.id,
                 actionType: ACTION_TYPES.APPROVED_REQUEST,
                 category: CATEGORIES.ACCESS,
                 severity: SEVERITIES.INFO,
