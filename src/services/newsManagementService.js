@@ -2,12 +2,14 @@ import { sequelize } from "../config/db.js";
 import { AwsService } from "./awsService.js";
 import { NewsService } from "./newsService.js";
 import { NewsPicturesService } from "./newsPicturesService.js";
+import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
 
 const awsService = new AwsService();
 const newsService = new NewsService(); 
 const newsPicturesService = new NewsPicturesService();
+const auditLogService = new AuditLogService();
 export class NewsManagementService {
-    async createNews(newsData) {
+    async createNews(newsData, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         const uploadedFileKeys = [];
@@ -40,6 +42,19 @@ export class NewsManagementService {
 
                 newsPictures.push(newsPicture);
             };
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_CREATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Created news article: "${news.nws_title}" (ID: ${news.id}).`,
+                metadata: { newsId: news.id, title: news.nws_title },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 
@@ -100,7 +115,7 @@ export class NewsManagementService {
         }));
     };
 
-    async updateNewsInfo(newsId, newsData) {
+    async updateNewsInfo(newsId, newsData, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         // Newly uploaded pictures
@@ -147,6 +162,19 @@ export class NewsManagementService {
                 newsPicturesToSend.push(newsPicture);
             };
 
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_UPDATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Updated news article: "${updatedNews.nws_title}" (ID: newsId).`,
+                metadata: { newsId, title: updatedNews.nws_title },
+                request: req,
+                transaction
+            });
+
             await transaction.commit();
 
             for (let i = 0; i < oldFileKeysToDelete.length; i++) {
@@ -173,13 +201,25 @@ export class NewsManagementService {
         }
     };
 
-    async updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted) {
+    async updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted, actorUserId, req) {
         const news = await newsService.updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted);
         
+        await auditLogService.log({
+            actorUserId,
+            targetUserId: null,
+            actionType: isTemporarilyDeleted ? ACTION_TYPES.CONTENT_DELETED : ACTION_TYPES.CONTENT_RESTORED,
+            category: CATEGORIES.STAFF,
+            severity: SEVERITIES.WARNING,
+            isSecurityAlert: false,
+            details: `${isTemporarilyDeleted ? 'Temporarily deleted' : 'Restored'} news article: "${news.nws_title}" (ID: ${newsId}).`,
+            metadata: { newsId, title: news.nws_title },
+            request: req
+        });
+
         return news;
     };
 
-    async softDeleteNews(newsId) {
+    async softDeleteNews(newsId, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         let newsPictures = [];
@@ -195,6 +235,19 @@ export class NewsManagementService {
 
             // Soft deletes news picture in table
             await newsPicturesService.softDeleteNewsPicturesByNewsId(news.id, transaction);
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_DELETED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.CRITICAL,
+                isSecurityAlert: true,
+                details: `Permanently deleted news article: "${news.nws_title}" (ID: ${newsId}).`,
+                metadata: { newsId, title: news.nws_title },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 

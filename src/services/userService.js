@@ -6,7 +6,7 @@ import { LoginAttemptService } from './loginAttemptService.js';
 const loginAttemptService = new LoginAttemptService();
 
 export class UserService {
-    async addUser(userData) {
+    async addUser(userData, transaction) {
         try {
             const user = await User.create({
                 usr_linked_application_id: userData.linkedApplicationId,
@@ -17,7 +17,7 @@ export class UserService {
                 usr_password: userData.password,
                 usr_pic_url: userData.picture,
                 usr_role: userData.role,
-            });
+            }, { transaction });
 
             return {
                 id: user.id,
@@ -32,11 +32,11 @@ export class UserService {
         }
     };
 
-    async validateCredentials(record, ip, username, password) {
-        const user = await User.findOne({ where: { usr_username : username } });
+    async validateCredentials(record, ip, username, password, req, transaction) {
+        const user = await User.findOne({ where: { usr_username : username }, transaction });
 
         if (!user) {
-            await loginAttemptService.onLoginFailed(record);
+            await loginAttemptService.onLoginFailed(record, req, transaction);
 
             throw new Error('Incorrect username or password');
         }
@@ -44,12 +44,12 @@ export class UserService {
         const isMatch = await bcrypt.compare(password, user.usr_password);
 
         if (!isMatch) {
-            await loginAttemptService.onLoginFailed(record);
+            await loginAttemptService.onLoginFailed(record, req, transaction);
             
             throw new Error('Incorrect username or password');
         }
 
-        await loginAttemptService.onLoginSuccess(ip, username);
+        await loginAttemptService.onLoginSuccess(ip, username, transaction);
 
         return user;
     };
@@ -70,9 +70,10 @@ export class UserService {
         return user;
     };
 
-    async findByUsername(username) {
+    async findByUsername(username, transaction) {
         const user = await User.findOne({
-            where : { usr_username : username }
+            where : { usr_username : username },
+            transaction
         });
 
         return user;
@@ -110,8 +111,8 @@ export class UserService {
         return updatedUser;
     };
 
-    async updateRole(userData) {
-        const user = await User.findByPk(userData.id);
+    async updateRole(userData, transaction) {
+        const user = await User.findByPk(userData.id, { transaction });
 
         if (!user) {
             throw new Error('User not found');
@@ -123,7 +124,7 @@ export class UserService {
 
         await user.update({
             usr_role: userData.role
-        });
+        }, { transaction });
 
         return {
             id : user.id, 
@@ -134,8 +135,8 @@ export class UserService {
         }
     };
 
-    async updateStatus(userData) {
-        const user = await User.findByPk(userData.id);
+    async updateStatus(userData, transaction) {
+        const user = await User.findByPk(userData.id, { transaction });
 
         if (!user) {
             throw new Error('User not found');
@@ -143,7 +144,7 @@ export class UserService {
 
         await user.update({
             usr_status: userData.status
-        });
+        }, { transaction });
 
         return {
             id : user.id, 

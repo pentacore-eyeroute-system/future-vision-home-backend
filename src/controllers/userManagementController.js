@@ -44,7 +44,7 @@ export class UserManagementController {
                 status: req.body.status.trim(),
             }
 
-            const result = await userManagementService.updatePendingUserApplication(userApplicationData);
+            const result = await userManagementService.updatePendingUserApplication(userApplicationData, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -66,7 +66,7 @@ export class UserManagementController {
                 role: req.body.role.trim(),
             }
 
-            const result = await userManagementService.updateRole(userData);
+            const result = await userManagementService.updateRole(userData, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -88,7 +88,7 @@ export class UserManagementController {
                 status: req.body.status.trim(),
             }
 
-            const result = await userManagementService.updateStatus(userData);
+            const result = await userManagementService.updateStatus(userData, req.user.id, req);
 
             res.status(200).json({
                 success: true,

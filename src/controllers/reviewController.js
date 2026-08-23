@@ -11,7 +11,7 @@ export class ReviewController {
                 feedback: req.body.feedback
             };
 
-            const result = await reviewManagementService.addReview(reviewData);
+            const result = await reviewManagementService.addReview(reviewData, req);
 
             res.status(201).json({
                 success: true,
@@ -54,7 +54,7 @@ export class ReviewController {
                 });
                 }
 
-            const result = await reviewManagementService.softDeleteReview(reviewId, req.user.id);
+            const result = await reviewManagementService.softDeleteReview(reviewId, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -78,7 +78,7 @@ export class ReviewController {
                 feedback: req.body.feedback
             };
 
-            const result = await reviewManagementService.updateReview(reviewId, reviewData);
+            const result = await reviewManagementService.updateReview(reviewId, reviewData, req);
 
             res.status(200).json({
                 success: true,

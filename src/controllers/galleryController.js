@@ -12,7 +12,7 @@ export class GalleryController {
                 files : req.files,
             };
 
-            const result = await galleryManagementService.createGallery(galleryData);
+            const result = await galleryManagementService.createGallery(galleryData, req.user.id, req);
  
             res.status(201).json({
                 success: true,
@@ -72,7 +72,7 @@ export class GalleryController {
                 existingGalleryPicturesIds: JSON.parse(req.body.existingGalleryPicturesIds || '[]'),
             };
 
-            const result = await galleryManagementService.updateGalleryInfo(galleryId, galleryData);
+            const result = await galleryManagementService.updateGalleryInfo(galleryId, galleryData, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -92,7 +92,7 @@ export class GalleryController {
             const galleryId = req.params.id;
             const isTemporarilyDeleted = req.body.isTemporarilyDeleted;
 
-            const result = await galleryManagementService.updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted);
+            const result = await galleryManagementService.updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -111,7 +111,7 @@ export class GalleryController {
         try {
             const galleryId = req.params.id;
 
-            await galleryManagementService.softDeleteGallery(galleryId);
+            await galleryManagementService.softDeleteGallery(galleryId, req.user.id, req);
 
             res.status(200).json({
                 success: true,

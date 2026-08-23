@@ -2,13 +2,15 @@ import { sequelize } from '../config/db.js'
 import { AwsService } from "./awsService.js";
 import { GalleryService } from "./galleryService.js";
 import { GalleryPictureService } from "./galleryPictureService.js";
+import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
 
 const awsService = new AwsService();
 const galleryService = new GalleryService();
 const galleryPictureService = new GalleryPictureService();
+const auditLogService = new AuditLogService();
 
 export class GalleryManagementService {
-    async createGallery(galleryData) {
+    async createGallery(galleryData, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         const uploadedFileKeys = [];
@@ -33,6 +35,19 @@ export class GalleryManagementService {
 
                 galleryPictures.push(galleryPicture);
             };
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_CREATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Created gallery: "${gallery.gal_title}" (ID: ${gallery.id}).`,
+                metadata: { galleryId: gallery.id, title: gallery.gal_title },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 
@@ -92,7 +107,7 @@ export class GalleryManagementService {
         }));
     };
 
-    async updateGalleryInfo(galleryId, galleryData) {
+    async updateGalleryInfo(galleryId, galleryData, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         // Newly uploaded pictures
@@ -139,6 +154,19 @@ export class GalleryManagementService {
                 galleryPicturesToSend.push(galleryPicture);
             };
 
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_UPDATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Updated gallery: "${gallery.gal_title}" (ID: ${galleryId}).`,
+                metadata: { galleryId, title: gallery.gal_title },
+                request: req,
+                transaction
+            });
+
             await transaction.commit();
 
             for (let i = 0; i < oldFileKeysToDelete.length; i++) {
@@ -166,13 +194,25 @@ export class GalleryManagementService {
         }
     };
 
-    async updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted) {
+    async updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted, actorUserId, req) {
         const gallery = await galleryService.updateIsTemporarilyDeletedStatus(galleryId, isTemporarilyDeleted);
         
+        await auditLogService.log({
+            actorUserId,
+            targetUserId: null,
+            actionType: isTemporarilyDeleted ? ACTION_TYPES.CONTENT_DELETED : ACTION_TYPES.CONTENT_RESTORED,
+            category: CATEGORIES.STAFF,
+            severity: SEVERITIES.WARNING,
+            isSecurityAlert: false,
+            details: `${isTemporarilyDeleted ? 'Temporarily deleted' : 'Restored'} gallery: "${gallery.gal_title}" (ID: ${galleryId}).`,
+            metadata: { galleryId, title: gallery.gal_title },
+            request: req
+        });
+
         return gallery;
     };
 
-    async softDeleteGallery(galleryId) {
+    async softDeleteGallery(galleryId, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         let galleryPictures = [];
@@ -188,6 +228,19 @@ export class GalleryManagementService {
 
             // Soft deletes gallery picture in table
             await galleryPictureService.softDeleteGalleryPicturesByGalleryId(galleryId, transaction);
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_DELETED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.CRITICAL,
+                isSecurityAlert: true,
+                details: `Permanently deleted gallery: "${gallery.gal_title}" (ID: ${galleryId}).`,
+                metadata: { galleryId, title: gallery.gal_title },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 

@@ -12,7 +12,7 @@ export class NewsController {
                 files : req.files,
             };
 
-            const result = await newsManagementService.createNews(newsData);
+            const result = await newsManagementService.createNews(newsData, req.user.id, req);
  
             res.status(201).json({
                 success: true,
@@ -72,7 +72,7 @@ export class NewsController {
                 existingNewsPicturesIds: JSON.parse(req.body.existingNewsPicturesIds || '[]'),
             };
 
-            const result = await newsManagementService.updateNewsInfo(newsId, newsData);            
+            const result = await newsManagementService.updateNewsInfo(newsId, newsData, req.user.id, req);            
 
             res.status(200).json({
                 success: true,
@@ -92,7 +92,7 @@ export class NewsController {
             const newsId = req.params.id;
             const isTemporarilyDeleted = req.body.isTemporarilyDeleted;
 
-            const result = await newsManagementService.updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted);
+            const result = await newsManagementService.updateIsTemporarilyDeletedStatus(newsId, isTemporarilyDeleted, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -111,7 +111,7 @@ export class NewsController {
         try {
             const newsId = req.params.id;
 
-            await newsManagementService.softDeleteNews(newsId);
+            await newsManagementService.softDeleteNews(newsId, req.user.id, req);
 
             res.status(200).json({
                 success: true,

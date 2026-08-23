@@ -1,12 +1,14 @@
 import { sequelize } from "../config/db.js";
 import { UserService } from "./userService.js";
 import { ReviewService } from "./reviewService.js";
+import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
 
 const userService = new UserService();
 const reviewService = new ReviewService();
+const auditLogService = new AuditLogService();
 
 export class ReviewManagementService {
-    async addReview(reviewData) {
+    async addReview(reviewData, req) {
         const transaction = await sequelize.transaction();
 
         try {
@@ -15,6 +17,19 @@ export class ReviewManagementService {
 
             // Stores review in table
             const review = await reviewService.addReview(reviewData, transaction);
+
+            await auditLogService.log({
+                actorUserId: reviewData.linkedReviewerId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_CREATED,
+                category: CATEGORIES.ACCESS,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Reviewer created a new review (ID: ${review.id}).`,
+                metadata: { reviewId: review.id, rating: reviewData.rating },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 
@@ -44,11 +59,24 @@ export class ReviewManagementService {
         }));
     };
 
-    async softDeleteReview(reviewId, reviewerId) {
+    async softDeleteReview(reviewId, reviewerId, req) {
         const transaction = await sequelize.transaction();
 
         try {
             await reviewService.softDeleteReview(reviewId, reviewerId, transaction);
+
+            await auditLogService.log({
+                actorUserId: reviewerId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_DELETED,
+                category: CATEGORIES.ACCESS,
+                severity: SEVERITIES.WARNING,
+                isSecurityAlert: false,
+                details: `Reviewer deleted review (ID: ${reviewId}).`,
+                metadata: { reviewId },
+                request: req,
+                transaction
+            });
 
             await transaction.commit()
         } catch (err) {
@@ -58,7 +86,7 @@ export class ReviewManagementService {
         }
     };
 
-    async updateReview(reviewId, reviewData) {
+    async updateReview(reviewId, reviewData, req) {
         const transaction = await sequelize.transaction();
 
         try {
@@ -68,6 +96,19 @@ export class ReviewManagementService {
                 reviewData.linkedReviewerId,
                 transaction,
             );
+
+            await auditLogService.log({
+                actorUserId: reviewData.linkedReviewerId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_UPDATED,
+                category: CATEGORIES.ACCESS,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Reviewer updated review (ID: ${reviewId}).`,
+                metadata: { reviewId, rating: reviewData.rating },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 

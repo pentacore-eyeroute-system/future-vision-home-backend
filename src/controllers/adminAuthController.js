@@ -41,7 +41,7 @@ export class AdminAuthController {
                 .replace('::ffff:', '')
                 .replace('::1', '127.0.0.1');
 
-            const result = await adminAuthService.login(ip, username, password);
+            const result = await adminAuthService.login(ip, username, password, req);
 
             res.status(200).json({
                 success : true,

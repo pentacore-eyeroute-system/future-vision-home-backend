@@ -4,12 +4,14 @@ import { TokenService } from "./tokenService.js";
 import { AuthUtil } from '../utils/authUtil.js';
 import { UserApplicationService } from "./userApplicationService.js";
 import { sequelize } from '../config/db.js';
+import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
 
 const userService = new UserService();
 const loginAttemptService = new LoginAttemptService();
 const tokenService = new TokenService();
 const authUtil = new AuthUtil();
 const userApplicationService = new UserApplicationService();
+const auditLogService = new AuditLogService();
 
 export class AdminAuthService {
     async signup(userData) {
@@ -25,71 +27,98 @@ export class AdminAuthService {
         return user;
     };
     
-    async login(ip, username, password) {
-        const record = await loginAttemptService.getRecord(ip, username);
-
-        // Finds user application
-        const userApplication = await userApplicationService.findByUsername(username);
-
-        if (!userApplication) {
-            throw new Error('Account not found. Please sign up first.')
-        }
-
-        // Rejects login if user application isn't approved
-        if (userApplication.apl_status !== "approved") {
-            if (userApplication.apl_status === "pending") {
-                throw new Error('Account not yet verified. Please check again later.');
-            }
-
-            if (userApplication.apl_status === "rejected") {
-                throw new Error('Account application was rejected.');
-            }
-        }
-        
-        // Finds the actual user record
-        const user = await userService.findByUsername(username);
-
-        if (!user) {
-            throw new Error('Account not found. Please sign up first.')
-        }
-
-        // Rejects login if user is disabled approved
-        if (user.usr_status === "disabled") {
-            throw new Error('Account has been disabled.')   
-        }
-
-        // Checks if user is blocked from previous session
-        const blockStatus = await loginAttemptService.checkIsBlocked(record);
-
-        if (blockStatus.isBlocked) {
-            this.throwTooManyAttempts(blockStatus.retryAfter);
-        }
+    async login(ip, username, password, req) {
+        const transaction = await sequelize.transaction();
 
         try {
-            // Finds matching user
-            const user = await userService.validateCredentials(record, ip, username, password);
+            const record = await loginAttemptService.getRecord(ip, username, transaction);
 
-            const payload = {
-                id: user.id,
-                role: (user.usr_role === "admin") ? "admin" : "editor"
-            };
+            // Finds user application
+            const userApplication = await userApplicationService.findByUsername(username, transaction);
 
-            // Generates JWT token for admin
-            const token = tokenService.generateJwt(payload);
-
-            return {
-                user,
-                token
-            };
-        } catch (err) {
-            // Re-checks block status AFTER a failed attempt
-            const postFailBlockStatus = await loginAttemptService.checkIsBlocked(record);
-
-            if (postFailBlockStatus.isBlocked) {
-                this.throwTooManyAttempts(postFailBlockStatus.retryAfter);
+            if (!userApplication) {
+                throw new Error('Account not found. Please sign up first.');
             }
 
-            // If not blocked yet, throw the original "Incorrect username or password" message
+            // Rejects login if user application isn't approved
+            if (userApplication.apl_status !== "approved") {
+                if (userApplication.apl_status === "pending") {
+                    throw new Error('Account not yet verified. Please check again later.');
+                }
+
+                if (userApplication.apl_status === "rejected") {
+                    throw new Error('Account application was rejected.');
+                }
+            }
+            
+            // Finds the actual user record
+            const user = await userService.findByUsername(username, transaction);
+
+            if (!user) {
+                throw new Error('Account not found. Please sign up first.');
+            }
+
+            // Rejects login if user is disabled approved
+            if (user.usr_status === "disabled") {
+                throw new Error('Account has been disabled.');
+            }
+
+            // Checks if user is blocked from previous session
+            const blockStatus = await loginAttemptService.checkIsBlocked(record, transaction);
+
+            if (blockStatus.isBlocked) {
+                this.throwTooManyAttempts(blockStatus.retryAfter);
+            }
+
+            try {
+                // Finds matching user
+                const userValidated = await userService.validateCredentials(record, ip, username, password, req, transaction);
+
+                const payload = {
+                    id: userValidated.id,
+                    role: (userValidated.usr_role === "admin") ? "admin" : "editor"
+                };
+
+                // Generates JWT token for admin
+                const token = tokenService.generateJwt(payload);
+
+                await auditLogService.log({
+                    actorUserId: userValidated.id,
+                    targetUserId: null,
+                    actionType: ACTION_TYPES.AUTH_LOGIN_SUCCESS,
+                    category: CATEGORIES.ACCESS,
+                    severity: SEVERITIES.INFO,
+                    isSecurityAlert: false,
+                    details: `User ${userValidated.usr_fullname} (${userValidated.usr_username}) logged in successfully.`,
+                    metadata: {
+                        userId: userValidated.id,
+                        username: userValidated.usr_username
+                    },
+                    request: req,
+                    transaction
+                });
+
+                await transaction.commit();
+
+                return {
+                    user: userValidated,
+                    token
+                };
+            } catch (err) {
+                // Re-checks block status AFTER a failed attempt
+                const postFailBlockStatus = await loginAttemptService.checkIsBlocked(record, transaction);
+
+                if (postFailBlockStatus.isBlocked) {
+                    await transaction.commit();
+                    this.throwTooManyAttempts(postFailBlockStatus.retryAfter);
+                }
+
+                await transaction.commit();
+                // If not blocked yet, throw the original "Incorrect username or password" message
+                throw err;
+            }
+        } catch (err) {
+            await transaction.rollback();
             throw err;
         }
     };
@@ -139,6 +168,21 @@ export class AdminAuthService {
                 },
                 transaction
             );
+
+            await auditLogService.log({
+                actorUserId: user.id,
+                targetUserId: user.id,
+                actionType: ACTION_TYPES.AUTH_PASSWORD_CHANGED,
+                category: CATEGORIES.SECURITY,
+                severity: SEVERITIES.WARNING,
+                isSecurityAlert: true,
+                details: `User ${user.usr_fullname} (${user.usr_username}) changed their password.`,
+                metadata: {
+                    userId: user.id,
+                    username: user.username
+                },
+                transaction
+            });
 
             await transaction.commit();
         } catch (err) {

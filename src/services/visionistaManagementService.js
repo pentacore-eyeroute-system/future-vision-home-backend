@@ -1,12 +1,14 @@
 import { VisionistaService } from "./visionistaService.js";
 import { AwsService } from "./awsService.js";
 import { sequelize } from "../config/db.js";
+import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
 
 const visionistaService = new VisionistaService();
 const awsService = new AwsService();
+const auditLogService = new AuditLogService();
 
 export class VisionistaManagementService {
-    async addVisionista(visionistaData) {
+    async addVisionista(visionistaData, actorUserId, req) {
         let fileKey = null;
         
         const transaction = await sequelize.transaction();
@@ -20,6 +22,19 @@ export class VisionistaManagementService {
             }
 
             const visionista = await visionistaService.createVisionista(visionistaData, transaction);
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_CREATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Created visionista profile: "${visionista.vis_fullname}" (ID: ${visionista.id}).`,
+                metadata: { visionistaId: visionista.id, fullname: visionista.vis_fullname },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 
@@ -62,7 +77,7 @@ export class VisionistaManagementService {
         }));
     };
 
-    async updateVisionistaInfo(visionistaId, visionistaData) {
+    async updateVisionistaInfo(visionistaId, visionistaData, actorUserId, req) {
         let newFileKey = null;
         let oldFileKey = null;
 
@@ -88,6 +103,19 @@ export class VisionistaManagementService {
             // Updates visionista info in table
             const updatedVisionista = await visionistaService.updateVisionistaInfo(visionista, visionistaData, transaction);
 
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_UPDATED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Updated visionista profile: "${updatedVisionista.vis_fullname}" (ID: ${visionistaId}).`,
+                metadata: { visionistaId, fullname: updatedVisionista.vis_fullname },
+                request: req,
+                transaction
+            });
+
             await transaction.commit();
 
             // Deletes picture in aws s3 if new picture was sent and there is an existing picture to delete
@@ -108,13 +136,25 @@ export class VisionistaManagementService {
         }    
     };
 
-    async updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted) {
+    async updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted, actorUserId, req) {
         const visionista = await visionistaService.updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted);
+
+        await auditLogService.log({
+            actorUserId,
+            targetUserId: null,
+            actionType: isTemporarilyDeleted ? ACTION_TYPES.CONTENT_DELETED : ACTION_TYPES.CONTENT_RESTORED,
+            category: CATEGORIES.STAFF,
+            severity: SEVERITIES.WARNING,
+            isSecurityAlert: false,
+            details: `${isTemporarilyDeleted ? 'Temporarily deleted' : 'Restored'} visionista profile: "${visionista.vis_fullname}" (ID: ${visionistaId}).`,
+            metadata: { visionistaId, fullname: visionista.vis_fullname },
+            request: req
+        });
 
         return visionista;
     };
 
-    async softDeleteVisionista(visionistaId) {
+    async softDeleteVisionista(visionistaId, actorUserId, req) {
         const transaction = await sequelize.transaction();
 
         try {
@@ -122,6 +162,19 @@ export class VisionistaManagementService {
 
             // Soft deletes visionista in table
             await visionistaService.softDeleteVisionista(visionista, transaction);
+
+            await auditLogService.log({
+                actorUserId,
+                targetUserId: null,
+                actionType: ACTION_TYPES.CONTENT_DELETED,
+                category: CATEGORIES.STAFF,
+                severity: SEVERITIES.CRITICAL,
+                isSecurityAlert: true,
+                details: `Permanently deleted visionista profile: "${visionista.vis_fullname}" (ID: ${visionistaId}).`,
+                metadata: { visionistaId, fullname: visionista.vis_fullname },
+                request: req,
+                transaction
+            });
 
             await transaction.commit();
 

@@ -24,16 +24,17 @@ export class UserApplicationService {
         }
     };
 
-    async findByUsername(username) {
+    async findByUsername(username, transaction) {
         const userApplication = await UserApplication.findOne({
-            where : { apl_username : username }
+            where : { apl_username : username },
+            transaction
         });
 
         return userApplication;
     };
 
-    async findById(userApplicationId) {
-        const userApplication = await UserApplication.findByPk(userApplicationId);
+    async findById(userApplicationId, transaction) {
+        const userApplication = await UserApplication.findByPk(userApplicationId, { transaction });
 
         return userApplication;
     };
@@ -47,12 +48,12 @@ export class UserApplicationService {
         return userApplications;
     };
 
-    async updateStatus(userApplicationData) {
-        await UserApplication.update({ apl_status: userApplicationData.status }, { where: { id: userApplicationData.id }});
+    async updateStatus(userApplicationData, transaction) {
+        await UserApplication.update({ apl_status: userApplicationData.status }, { where: { id: userApplicationData.id }, transaction });
 
         const userApplication = await UserApplication.findByPk(
             userApplicationData.id,
-            { raw: true }
+            { raw: true, transaction }
         );
 
         return userApplication;

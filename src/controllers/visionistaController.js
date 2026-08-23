@@ -12,7 +12,7 @@ export class VisionistaController {
                 file : req.file,
             };
 
-            const result = await visionistaManagementService.addVisionista(visionistaData);
+            const result = await visionistaManagementService.addVisionista(visionistaData, req.user.id, req);
 
             res.status(201).json({
                 success: true,
@@ -74,7 +74,7 @@ export class VisionistaController {
                 visionistaData.file = req.file;
             }
 
-            const result = await visionistaManagementService.updateVisionistaInfo(visionistaId, visionistaData);
+            const result = await visionistaManagementService.updateVisionistaInfo(visionistaId, visionistaData, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -94,7 +94,7 @@ export class VisionistaController {
             const visionistaId = req.params.id;
             const isTemporarilyDeleted = req.body.isTemporarilyDeleted;
 
-            const result = await visionistaManagementService.updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted);
+            const result = await visionistaManagementService.updateIsTemporarilyDeletedStatus(visionistaId, isTemporarilyDeleted, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -113,7 +113,7 @@ export class VisionistaController {
         try {
             const visionistaId = req.params.id;
 
-            const result = await visionistaManagementService.softDeleteVisionista(visionistaId);
+            const result = await visionistaManagementService.softDeleteVisionista(visionistaId, req.user.id, req);
 
             res.status(200).json({
                 success: true,
