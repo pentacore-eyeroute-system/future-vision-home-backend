@@ -21,7 +21,7 @@ export class LoginAttemptService {
         return record;
     };
 
-    async checkIsBlocked(record) {
+    async checkIsBlocked(record, transaction) {
         // If block already expired, then reset
         if (record.log_blocked_until && new Date() > record.log_blocked_until) {
             record.log_attempts = 0;

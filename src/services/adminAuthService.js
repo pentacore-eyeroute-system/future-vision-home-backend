@@ -118,7 +118,9 @@ export class AdminAuthService {
                 throw err;
             }
         } catch (err) {
-            await transaction.rollback();
+            if (!transaction.finished) {
+                await transaction.rollback();
+            }
             throw err;
         }
     };
