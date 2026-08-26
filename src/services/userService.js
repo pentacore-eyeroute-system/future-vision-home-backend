@@ -51,7 +51,12 @@ export class UserService {
 
         await loginAttemptService.onLoginSuccess(ip, username, transaction);
 
-        return user;
+        return {
+            id : user.id,
+            usr_email: user.usr_email,
+            usr_fullname: user.usr_fullname,
+            usr_username: user.usr_username,
+        };
     };
 
     async findByGoogleSub(googleSub) {
