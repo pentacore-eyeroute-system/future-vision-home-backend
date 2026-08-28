@@ -155,9 +155,12 @@ export class UserManagementService {
         const transaction = await sequelize.transaction();
 
         try {
+            const user = await userService.findById(userData.id);
+
             const activeAdminsLength = await userService.getNumberOfActiveAdmins();
 
-            if (activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
+            if (user.usr_role === 'admin' &&
+                activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
                 throw new Error('Cannot disable this admin. The minimum number of active admins must be maintained.');
             }
 
