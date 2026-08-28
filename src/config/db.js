@@ -20,9 +20,6 @@ export async function startDbConnection() {
         console.log('Database connection successful');
         await sequelize.sync();
     } catch (err) {
-        console.error('\n --- DATABASE CONNECTION FAILED --- ');
-        console.error('The real underlying database error is:\n', err.message || err);
-        console.error('-----------------------------------------\n');
         process.exit(1);
     }
 }

@@ -20,7 +20,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });            
         }
     };
@@ -37,7 +37,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });                  
         }
     };
@@ -54,7 +54,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });                  
         }
     };
@@ -77,7 +77,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };
@@ -97,7 +97,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };
@@ -115,7 +115,7 @@ export class PartnerController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };

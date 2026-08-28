@@ -53,7 +53,7 @@ export class AuditLogController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -87,7 +87,7 @@ export class AuditLogController {
 
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -134,7 +134,7 @@ export class AuditLogController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };

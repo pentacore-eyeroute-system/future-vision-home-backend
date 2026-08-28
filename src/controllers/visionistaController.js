@@ -22,7 +22,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });            
         }
     };
@@ -39,7 +39,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });                  
         }
     };
@@ -56,7 +56,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });                  
         }
     };
@@ -84,7 +84,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };
@@ -104,7 +104,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };
@@ -123,7 +123,7 @@ export class VisionistaController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };

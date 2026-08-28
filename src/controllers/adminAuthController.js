@@ -29,7 +29,7 @@ export class AdminAuthController {
 
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -51,7 +51,7 @@ export class AdminAuthController {
         } catch (err) {
             res.status(err.statusCode || 401).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
                 retryAfter: err.retryAfter || null,
             });
         }
@@ -73,7 +73,7 @@ export class AdminAuthController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };

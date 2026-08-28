@@ -161,7 +161,7 @@ export class UserManagementService {
 
             if (user.usr_role === 'admin' &&
                 activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
-                throw new Error('Cannot disable this admin. The minimum number of active admins must be maintained.');
+                throw new Error('Unable to complete the requested action.');
             }
 
             const updatedUser = await userService.updateStatus(userData, transaction);

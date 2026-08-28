@@ -22,7 +22,7 @@ export class ReviewerAuthController {
         } catch (err) {
             res.status(401).json({
                 success : false,
-                error : err.message,
+                error: 'An internal server error occurred',
             });
         }
     };

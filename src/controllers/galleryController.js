@@ -22,7 +22,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -39,7 +39,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -56,7 +56,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });                  
         }
     };
@@ -82,7 +82,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });
         }
     };
@@ -102,7 +102,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         }
     };
@@ -120,7 +120,7 @@ export class GalleryController {
         } catch (err) {
             res.status(500).json({
                 success: false,
-                error: err.message,
+                error: 'An internal server error occurred',
             });    
         } 
     };

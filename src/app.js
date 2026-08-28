@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import adminAuthRoutes from './routes/adminAuthRoutes.js';
 import visionistaRoutes from './routes/visionistaRoutes.js';
 import partnerRoutes from './routes/partnerRoutes.js';
@@ -13,11 +14,41 @@ import './models/associateModels.js';
 
 const app = express();
 
+// Disables the X-Powered-By header
+app.disable('x-powered-by');
+
+// Hides Server Header
+app.use((req, res, next) => {
+    res.removeHeader('Server');
+    next();
+});
+
+// Fixes Anti-clickjacking, X-Content-Type-Options, and other systemic alerts
+app.use(helmet());
+
 app.use(cors({
     origin: ['https://future-vision-home.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true
 }));
+
 app.use(express.json());
+
+// Custom Security Header Overrides
+app.use(
+    helmet.hsts({
+        maxAge: 31536000, // 1 year
+        includeSubDomains: true,
+        preload: true
+    }),
+    helmet.contentSecurityPolicy({
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "'unsafe-inline'"], // unsafe-inline may be needed for some frontends, but 'self' is safer
+      "style-src": ["'self'", "fonts.googleapis.com"],
+      "img-src": ["'self'", "data:"],
+    },
+  })
+);
 app.set('trust proxy', 1);
 
 //API routes
