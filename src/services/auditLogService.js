@@ -172,9 +172,9 @@ export class AuditLogService {
     }
 
     async getAuditLogs(filters = {}) {
-        const page = parseInt(filters.page) || 1;
-        const limit = parseInt(filters.limit) || 10;
-        const offset = (page - 1) * limit;
+        // const page = parseInt(filters.page) || 1;
+        // const limit = parseInt(filters.limit) || 10;
+        // const offset = (page - 1) * limit;
 
         const where = {};
 
@@ -219,15 +219,15 @@ export class AuditLogService {
                 { model: UserApplication, as: 'targetApplication', attributes: ['id', 'apl_fullname', 'apl_email', 'apl_username', 'apl_status'] }
             ],
             order: [['createdAt', 'DESC']],
-            limit,
-            offset
+            // limit,
+            // offset
         });
 
         return {
-            total: count,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
-            limit,
+            // total: count,
+            // totalPages: Math.ceil(count / limit),
+            // currentPage: page,
+            // limit,
             logs: rows.map(log => this.formatLog(log))
         };
     }
