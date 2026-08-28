@@ -75,6 +75,13 @@ export class PartnerController {
                 result
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -95,6 +102,13 @@ export class PartnerController {
                 result
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -113,6 +127,13 @@ export class PartnerController {
                 message: 'Visionista soft delete success',
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',

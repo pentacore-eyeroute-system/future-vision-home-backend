@@ -37,17 +37,26 @@ export class AdminAuthService {
             const userApplication = await userApplicationService.findByUsername(username, transaction);
 
             if (!userApplication) {
-                throw new Error('Account not found. Please sign up first.');
+                const error = new Error('Account not found. Please sign up first.');
+                error.statusCode = 404; // Mark it so the controller knows it's "safe"
+                
+                throw error;
             }
 
             // Rejects login if user application isn't approved
             if (userApplication.apl_status !== "approved") {
                 if (userApplication.apl_status === "pending") {
-                    throw new Error('Account not yet verified. Please check again later.');
+                    const error = new Error('Account not yet verified. Please check again later.');
+                    error.statusCode = 403; // Mark it so the controller knows it's "safe"
+                    
+                    throw error;
                 }
 
                 if (userApplication.apl_status === "rejected") {
-                    throw new Error('Account application was rejected.');
+                    const error = new Error('Account application was rejected.');
+                    error.statusCode = 403; // Mark it so the controller knows it's "safe"
+                    
+                    throw error;
                 }
             }
             
@@ -55,12 +64,18 @@ export class AdminAuthService {
             const user = await userService.findByUsername(username, transaction);
 
             if (!user) {
-                throw new Error('Account not found. Please sign up first.');
+                const error = new Error('Account not found. Please sign up first.');
+                error.statusCode = 404; // Mark it so the controller knows it's "safe"
+                
+                throw error;
             }
 
             // Rejects login if user is disabled approved
             if (user.usr_status === "disabled") {
-                throw new Error('Account has been disabled.');
+                const error = new Error('Account has been disabled.');
+                error.statusCode = 403; // Mark it so the controller knows it's "safe"
+                
+                throw error;
             }
 
             // Checks if user is blocked from previous session
@@ -158,7 +173,10 @@ export class AdminAuthService {
             const isMatch = await authUtil.comparePassword(userData.password, user.usr_password);
 
             if (isMatch) {
-                throw new Error('New password cannot be the same as the current password');
+                const error = new Error('New password cannot be the same as the current password');
+                error.statusCode = 400;
+                
+                throw error;
             }
 
             const hashedPassword = await authUtil.hashPassword(userData.password);

@@ -57,9 +57,6 @@ const ACTION_LABELS = {
 };
 
 export class AuditLogService {
-    /**
-     * Centralized method to write an audit log to the database.
-     */
     async log({
         actorUserId = null,
         targetUserId = null,
@@ -76,16 +73,28 @@ export class AuditLogService {
     }) {
         // Enforce validation on actions, categories, severities, and actors
         if (!Object.values(ACTION_TYPES).includes(actionType)) {
-            throw new Error(`Invalid actionType: ${actionType}`);
+            const error = new Error('Invalid actionType');
+            error.statusCode = 400;
+
+            throw error;
         }
         if (!Object.values(CATEGORIES).includes(category)) {
-            throw new Error(`Invalid category: ${category}`);
+            const error = new Error('Invalid category');
+            error.statusCode = 400;
+            
+            throw error;
         }
         if (!Object.values(SEVERITIES).includes(severity)) {
-            throw new Error(`Invalid severity: ${severity}`);
+            const error = new Error('Invalid severity');
+            error.statusCode = 400;
+            
+            throw error;
         }
         if (!Object.values(ACTOR_TYPES).includes(actorType)) {
-            throw new Error(`Invalid actorType: ${actorType}`);
+            const error = new Error('Invalid actorType');
+            error.statusCode = 400;
+
+            throw error;
         }
 
         // Sanitize sensitive values from metadata if present
@@ -242,7 +251,10 @@ export class AuditLogService {
         });
 
         if (!log) {
-            throw new Error("Audit log not found");
+            const error = new Error('Audit log not found');
+            error.statusCode = 404; // Mark it so the controller knows it's "safe"
+            
+            throw error;
         }
 
         return this.formatLog(log);

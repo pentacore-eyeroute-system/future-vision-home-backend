@@ -48,11 +48,14 @@ export class ReviewService {
         if (!review) {
             const error = new Error('Review not found');
             error.statusCode = 404;
+            
             throw error;
         }
+
         if (review.rev_linked_reviewer_id !== reviewerId){
-            const error = new Error('Forbidden: Not allowed to delete others review');
+            const error = new Error('User cannot delete others\' review');
             error.statusCode = 403;
+
             throw error;
         }
         
@@ -69,7 +72,10 @@ export class ReviewService {
         });
 
         if (!review) {
-            throw new Error('Review not found');
+            const error = new Error('Review not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         await review.update({

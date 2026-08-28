@@ -63,7 +63,10 @@ export class GalleryService {
         const gallery = await Gallery.findByPk(galleryId);
 
         if (!gallery) {
-            throw new Error('Gallery not found');
+            const error = new Error('Gallery not found');
+            error.statusCode = 404;
+            
+            throw error;
         };
 
         await gallery.update({

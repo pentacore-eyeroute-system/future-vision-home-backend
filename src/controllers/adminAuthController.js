@@ -20,8 +20,8 @@ export class AdminAuthController {
                 result
             });
         } catch (err) {
-            if (err.message === 'Email is already used') {
-                return res.status(409).json({
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
                     success: false,
                     error: err.message
                 });
@@ -49,10 +49,10 @@ export class AdminAuthController {
                 result
             });
         } catch (err) {
-            if (err.message === 'Incorrect username or password') {
-                return res.status(401).json({
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
                     success: false,
-                    error: 'Invalid email or password' ,
+                    error: err.message,
                     retryAfter: err.retryAfter || null,
                 });
             }
@@ -78,6 +78,13 @@ export class AdminAuthController {
                 message : 'Update password success',
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',

@@ -25,7 +25,10 @@ export class UserService {
             };
         } catch (err) {
             if (err.name === 'SequelizeUniqueConstraintError') {
-                throw new Error('Email is already used');
+                const error = new Error('Email is already used');
+                error.statusCode = 409;
+                
+                throw error;
             }
 
             throw err;
@@ -38,15 +41,21 @@ export class UserService {
         if (!user) {
             await loginAttemptService.onLoginFailed(record, req, transaction);
 
-            throw new Error('Incorrect username or password');
+            const error = new Error('Incorrect username or password');
+            error.statusCode = 401; // Mark it so the controller knows it's "safe"
+            
+            throw error;
         }
 
         const isMatch = await bcrypt.compare(password, user.usr_password);
 
         if (!isMatch) {
             await loginAttemptService.onLoginFailed(record, req, transaction);
+
+            const error = new Error('Incorrect username or password');
+            error.statusCode = 401; // Mark it so the controller knows it's "safe"
             
-            throw new Error('Incorrect username or password');
+            throw error;            
         }
 
         await loginAttemptService.onLoginSuccess(ip, username, transaction);
@@ -69,7 +78,10 @@ export class UserService {
         const user = await User.findByPk(userId, { transaction });
 
         if (!user) {
-            throw new Error('User not found');
+            const error = new Error('User not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         return user;
@@ -120,11 +132,17 @@ export class UserService {
         const user = await User.findByPk(userData.id, { transaction });
 
         if (!user) {
-            throw new Error('User not found');
+            const error = new Error('User not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         if (userData.role === user.usr_role) {
-            throw new Error("New role is the same as the current role");
+            const error = new Error('New role is the same as the current role');
+            error.statusCode = 400;
+            
+            throw error;
         }
 
         await user.update({
@@ -144,7 +162,10 @@ export class UserService {
         const user = await User.findByPk(userData.id, { transaction });
 
         if (!user) {
-            throw new Error('User not found');
+            const error = new Error('User not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         await user.update({

@@ -35,7 +35,10 @@ export class PartnerService {
         const partner = await Partner.findByPk(partnerId);
 
         if (!partner) {
-            throw new Error('Partner not found')
+            const error = new Error('Partner not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         partner.update({
@@ -50,7 +53,10 @@ export class PartnerService {
         const partner = await Partner.findByPk(partnerId);
 
         if (!partner) {
-            throw new Error('Partner not found')
+            const error = new Error('Partner not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         partner.update({
@@ -64,7 +70,10 @@ export class PartnerService {
         const partner = await Partner.findByPk(partnerId);
 
         if (!partner) {
-            throw new Error('Partner not found')
+            const error = new Error('Partner not found');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         partner.destroy();

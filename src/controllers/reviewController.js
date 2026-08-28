@@ -19,6 +19,13 @@ export class ReviewController {
                 result
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -62,7 +69,14 @@ export class ReviewController {
                 result
             });
         } catch (err) {
-            res.status(err.statusCode || 500).json({
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
+            res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
             });
@@ -86,6 +100,13 @@ export class ReviewController {
                 result
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',

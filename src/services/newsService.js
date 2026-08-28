@@ -50,7 +50,10 @@ export class NewsService {
         const news = await News.findByPk(newsId, { transaction });
 
         if (!news) {
-            throw new Error('News not found');
+            const error = new Error('News not found');
+            error.statusCode = 404;
+            
+            throw error;
         };
 
         return news;
@@ -83,7 +86,10 @@ export class NewsService {
         const news = await News.findByPk(newsId);
 
         if (!news) {
-            throw new Error('News not found');
+            const error = new Error('News not found');
+            error.statusCode = 404;
+            
+            throw error;
         };
 
         await news.update({

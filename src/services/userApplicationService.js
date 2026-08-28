@@ -17,7 +17,10 @@ export class UserApplicationService {
             };
         } catch (err) {
             if (err.name === 'SequelizeUniqueConstraintError') {
-                throw new Error('Email is already used');
+                const error = new Error('Email is already used');
+                error.statusCode = 409;
+                
+                throw error;
             }
 
             throw err;

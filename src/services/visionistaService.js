@@ -27,7 +27,10 @@ export class VisionistaService {
         const visionista = await Visionista.findByPk(visionistaId, { transaction });
 
         if (!visionista) {
-            throw new Error('Visionista not found')
+            const error = new Error('Visionista not found.');
+            error.statusCode = 404;
+            
+            throw error;
         }        
 
         return visionista;
@@ -61,7 +64,10 @@ export class VisionistaService {
         const visionista = await Visionista.findByPk(visionistaId);
 
         if (!visionista) {
-            throw new Error('Visionista not found')
+            const error = new Error('Visionista not found.');
+            error.statusCode = 404;
+            
+            throw error;
         }
 
         await visionista.update({

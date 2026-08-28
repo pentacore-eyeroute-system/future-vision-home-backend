@@ -31,7 +31,10 @@ export class UserManagementService {
             if (userApplication.apl_status === "approved" ||
                 userApplication.apl_status === "rejected"
             ) {
-                throw new Error('Application has already been approved/rejected');
+                const error = new Error('Application has already been approved/rejected');
+                error.statusCode = 403; // Mark it so the controller knows it's "safe"
+                
+                throw error;                
             }
 
             const updatedUserApplication = await userApplicationService.updateStatus(userApplicationData, transaction);
@@ -160,10 +163,10 @@ export class UserManagementService {
             const activeAdminsLength = await userService.getNumberOfActiveAdmins();
 
             if (user.usr_role === 'admin' &&
-                activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
+                activeAdminsLength === ACTIVE_ADMINS_MINIUM_LENGTH) {
 
-                const error = new Error('Cannot disable admin. A minimum of 2 active administrators is required.');
-                error.isBusinessLogic = true; // Mark it so the controller knows it's "safe"
+                const error = new Error('Cannot disable admin. A minimum of 2 active administrators is required');
+                error.statusCode = 409; // Mark it so the controller knows it's "safe"
                 
                 throw error;
             }

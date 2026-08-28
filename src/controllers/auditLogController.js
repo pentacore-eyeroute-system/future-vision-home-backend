@@ -51,6 +51,13 @@ export class AuditLogController {
                 result,
             });
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -78,10 +85,10 @@ export class AuditLogController {
                 result: log,
             });
         } catch (err) {
-            if (err.message === "Audit log not found") {
-                return res.status(404).json({
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
                     success: false,
-                    error: err.message,
+                    error: err.message
                 });
             }
 
@@ -100,7 +107,7 @@ export class AuditLogController {
             if (user.usr_role !== "admin") {
                 return res.status(403).json({
                     success: false,
-                    error: "Forbidden: Admin access required to export audit logs.",
+                    error: "Unauthorized user to export audit logs.",
                 });
             }
 
@@ -130,8 +137,16 @@ export class AuditLogController {
 
             res.setHeader("Content-Type", "text/csv");
             res.setHeader("Content-Disposition", 'attachment; filename="audit_logs.csv"');
+            
             return res.status(200).send(csvContent);
         } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
