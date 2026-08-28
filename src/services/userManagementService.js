@@ -161,7 +161,11 @@ export class UserManagementService {
 
             if (user.usr_role === 'admin' &&
                 activeAdminsLength == ACTIVE_ADMINS_MINIUM_LENGTH) {
-                throw new Error('Unable to complete the requested action.');
+
+                const error = new Error('Cannot disable admin. A minimum of 2 active administrators is required.');
+                error.isBusinessLogic = true; // Mark it so the controller knows it's "safe"
+                
+                throw error;
             }
 
             const updatedUser = await userService.updateStatus(userData, transaction);

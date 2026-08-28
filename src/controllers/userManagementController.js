@@ -96,6 +96,13 @@ export class UserManagementController {
                 result
             });
         } catch (err) {
+            if (err.isBusinessLogic) {
+                return res.status(400).json({ 
+                    success: false,
+                    error: err.message,
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',

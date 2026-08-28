@@ -49,10 +49,17 @@ export class AdminAuthController {
                 result
             });
         } catch (err) {
-            res.status(err.statusCode || 401).json({
+            if (err.message === 'Incorrect username or password') {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Invalid email or password' ,
+                    retryAfter: err.retryAfter || null,
+                });
+            }
+
+            res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
-                retryAfter: err.retryAfter || null,
             });
         }
     };
