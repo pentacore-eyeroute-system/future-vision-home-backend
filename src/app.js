@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import adminAuthRoutes from './routes/adminAuthRoutes.js';
 import visionistaRoutes from './routes/visionistaRoutes.js';
 import partnerRoutes from './routes/partnerRoutes.js';
@@ -25,18 +24,6 @@ app.use((req, res, next) => {
     res.removeHeader('Server');
     next();
 });
-
-// Custom Security Header Overrides
-app.use(
-    helmet({
-        contentSecurityPolicy: false,
-        hsts: {
-            maxAge: 31536000, // 1 year
-            includeSubDomains: true,
-            preload: true
-        }
-    }),
-);
 
 app.use(cors({
     origin: ['https://future-vision-home.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
