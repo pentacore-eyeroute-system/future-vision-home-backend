@@ -7,6 +7,15 @@ const tokenService = new TokenService();
 export class ReviewerAuthService {
     async login(userData) {
         let user = {};
+
+        const existingUser = userService.findByEmail(userData.email);
+
+        if (existingUser) {
+            const error = new Error('Email is already registered as a Future Vision Home staff member');
+            error.statusCode = 409;
+
+            throw error;
+        }
         
         user = await userService.findByGoogleSub(userData.googleSub);
 

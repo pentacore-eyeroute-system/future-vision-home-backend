@@ -96,6 +96,12 @@ export class UserService {
         return user;
     };
 
+    async findByEmail(email) {
+        const user = await User.findOne({ where : { usr_email : email } });
+
+        return user;
+    }
+
     async getAllStaffMembers() {
         const staffMembers = await User.findAll({
             where: { 

@@ -20,7 +20,14 @@ export class ReviewerAuthController {
                 result
             });
         } catch (err) {
-            res.status(401).json({
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }            
+
+            res.status(500).json({
                 success : false,
                 error: 'An internal server error occurred',
             });

@@ -54,7 +54,7 @@ export class ReviewManagementService {
                 id: review.id,
                 rev_rating: review.rev_rating,
                 rev_feedback: review.rev_feedback,
-                rev_date: review.createdAt
+                rev_date: review.updatedAt
             }
         }));
     };
