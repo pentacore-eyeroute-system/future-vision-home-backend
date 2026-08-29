@@ -11,7 +11,7 @@ export class ReviewerAuthService {
         user = await userService.findByGoogleSub(userData.googleSub);
 
         if (!user) {
-            const existingUser = userService.findByEmail(userData.email);
+            const existingUser = await userService.findByEmail(userData.email);
 
             if (existingUser) {
                 const error = new Error('Email is already registered as a Future Vision Home staff member');
