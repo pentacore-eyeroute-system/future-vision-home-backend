@@ -175,8 +175,6 @@ export class AuditLogService {
             } : null,
             details: plainLog.aud_details,
             metadata: plainLog.aud_metadata,
-            ipAddress: plainLog.aud_ip_address,
-            userAgent: plainLog.aud_user_agent,
         };
     }
 

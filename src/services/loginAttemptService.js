@@ -79,7 +79,7 @@ export class LoginAttemptService {
                 category: CATEGORIES.SECURITY,
                 severity: SEVERITIES.CRITICAL,
                 isSecurityAlert: true,
-                details: `IP ${record.log_ip} blocked for 5 minutes due to 3 failed login attempts on username '${record.log_username}'.`,
+                details: `${record.log_username} was blocked for 5 minutes due to 3 failed login attempts'.`,
                 metadata: {
                     ip: record.log_ip,
                     username: record.log_username,
