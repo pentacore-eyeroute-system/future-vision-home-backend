@@ -14,6 +14,9 @@ import './models/associateModels.js';
 
 const app = express();
 
+// Tells Express to trust Nginx
+app.set('trust proxy', 1);
+
 // Disables the X-Powered-By header
 app.disable('x-powered-by');
 
@@ -23,34 +26,27 @@ app.use((req, res, next) => {
     next();
 });
 
-// Fixes Anti-clickjacking, X-Content-Type-Options, and other systemic alerts
-app.use(helmet());
+// Custom Security Header Overrides
+app.use(
+    helmet({
+        contentSecurityPolicy: false,
+        hsts: {
+            maxAge: 31536000, // 1 year
+            includeSubDomains: true,
+            preload: true
+        }
+    }),
+);
 
 app.use(cors({
     origin: ['https://future-vision-home.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true
 }));
 
+// Request body limits (Handles 413 status code error)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Custom Security Header Overrides
-app.use(
-    helmet.hsts({
-        maxAge: 31536000, // 1 year
-        includeSubDomains: true,
-        preload: true
-    }),
-    helmet.contentSecurityPolicy({
-    directives: {
-      "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'"], // unsafe-inline may be needed for some frontends, but 'self' is safer
-      "style-src": ["'self'", "fonts.googleapis.com"],
-      "img-src": ["'self'", "data:"],
-    },
-  })
-);
-app.set('trust proxy', 1);
 
 //API routes
 app.use('/api/reviewer-auth', reviewerAuthRoutes);
