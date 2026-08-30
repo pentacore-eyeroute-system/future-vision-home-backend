@@ -179,6 +179,19 @@ export class AdminAuthService {
         }
     };
 
+    async confirmPassword(userData) {
+        const user = await userService.findById(userData.id);
+
+        const isMatch = await authUtil.comparePassword(userData.password, user.usr_password);
+
+        if (!isMatch) {
+            const error = new Error('Incorrect password');
+            error.statusCode = 401; // Mark it so the controller knows it's "safe"
+            
+            throw error;   
+        }
+    }
+
     async updatePassword(userData) {
         const transaction = await sequelize.transaction();
 

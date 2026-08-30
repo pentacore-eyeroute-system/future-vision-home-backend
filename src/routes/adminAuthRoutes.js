@@ -8,8 +8,9 @@ const adminAuthController = new AdminAuthController();
 // POST route
 router.post('/onboard', adminAuthController.signup);
 router.post('/login', adminAuthController.login);
+router.post('/confirm-password', authenticateToken, adminAuthController.confirmPassword); 
 
 // PATCH route
-router.patch('/password', authenticateToken, adminAuthController.updatePassword); // id points to user id
+router.patch('/password', authenticateToken, adminAuthController.updatePassword);
 
 export default router;

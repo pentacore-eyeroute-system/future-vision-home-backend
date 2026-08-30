@@ -64,6 +64,35 @@ export class AdminAuthController {
         }
     };
 
+    confirmPassword = async (req, res) => {
+        try {
+            let userData = {
+                id: req.user.id,
+                password: req.body.password.trim(),
+            };
+
+            await adminAuthService.confirmPassword(userData);
+
+            res.status(200).json({
+                success : true,
+                message : 'Confirm password success',
+            });
+
+        } catch (err) {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                error: 'An internal server error occurred',
+            }); 
+        }
+    }
+
     updatePassword = async (req, res) => {
         try {
             let userData = {
