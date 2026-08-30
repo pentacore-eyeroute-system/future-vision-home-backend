@@ -22,6 +22,10 @@ export class UserService {
             return {
                 id: user.id,
                 username: user.usr_username,
+                fullname: user.usr_fullname,
+                email: user.usr_email,
+                picture: user.usr_pic_url,
+                role: user.usr_role,
             };
         } catch (err) {
             if (err.name === 'SequelizeUniqueConstraintError') {

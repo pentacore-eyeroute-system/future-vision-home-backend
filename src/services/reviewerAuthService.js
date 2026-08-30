@@ -41,10 +41,10 @@ export class ReviewerAuthService {
         return {
             user: {
                 id: user.id,
-                fullname: user.usr_fullname,
-                email: user.usr_email,
-                picture: user.usr_pic_url,
-                role: user.usr_role,
+                fullname: user.usr_fullname || user.fullname,
+                email: user.usr_email || user.email,
+                picture: user.usr_pic_url || user.picture,
+                role: user.usr_role || user.role,
                 token: token,
             },
         };
