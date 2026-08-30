@@ -18,8 +18,8 @@ export class AuditLogController {
             }
 
             const {
-                // page,
-                // limit,
+                page,
+                limit,
                 category,
                 actionType,
                 severity,
@@ -32,8 +32,8 @@ export class AuditLogController {
             } = req.query;
 
             const result = await auditLogManagementService.getAuditLogs({
-                // page,
-                // limit,
+                page,
+                limit,
                 category,
                 actionType,
                 severity,
