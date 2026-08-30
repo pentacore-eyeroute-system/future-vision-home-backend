@@ -123,7 +123,10 @@ export class UserService {
 
     async getNumberOfActiveAdmins() {
         const admins = await User.findAll({
-            where : { 'usr_role' : 'admin' }  
+            where : { 
+                'usr_role' : 'admin',
+                'usr_status' : 'active' 
+            }  
         });
 
         return admins.length;
