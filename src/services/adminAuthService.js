@@ -22,6 +22,21 @@ export class AdminAuthService {
             password : hashedPassword
         }
 
+        const existingUser = await userService.findByEmail(userData.email);
+
+        if (existingUser) {
+            let errorMessage = ''
+
+            errorMessage = existingUser.usr_role === 'reviewer' 
+                            ? 'Email is already registered as a reviewer and cannot be used for a staff account.'
+                            : 'Email is already registered as a Future Vision Home staff member'
+
+            const error = new Error(errorMessage);
+            error.statusCode = 409;
+
+            throw error;
+        }
+
         const user = await userApplicationService.addApplication(userData);
 
         return user;

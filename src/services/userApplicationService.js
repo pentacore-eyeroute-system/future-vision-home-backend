@@ -17,7 +17,7 @@ export class UserApplicationService {
             };
         } catch (err) {
             if (err.name === 'SequelizeUniqueConstraintError') {
-                const error = new Error('Email is already used');
+                const error = new Error('Email is already registered and has a pending account application.');
                 error.statusCode = 409;
                 
                 throw error;
