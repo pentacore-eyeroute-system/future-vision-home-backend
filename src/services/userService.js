@@ -69,6 +69,7 @@ export class UserService {
             usr_email: user.usr_email,
             usr_fullname: user.usr_fullname,
             usr_username: user.usr_username,
+            usr_role: user.usr_role,
         };
     };
 
