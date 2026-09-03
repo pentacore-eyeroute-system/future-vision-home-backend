@@ -156,10 +156,8 @@ export class AdminAuthService {
     };
 
     throwTooManyAttempts(retryAfter) {
-        const error = new Error('Too many attempts');
-
+        const error = new Error(this.getRetryMessage(retryAfter));
         error.statusCode = 429;
-        error.retryAfter = this.getRetryMessage(retryAfter);
 
         throw error;
     }
