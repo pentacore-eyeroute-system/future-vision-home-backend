@@ -10,6 +10,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import userManagementRoutes from './routes/userManagementRoutes.js';
 import auditLogRoutes from './routes/auditLogRoutes.js';
 import './models/associateModels.js';
+import { noCache } from './middleware/noCache.js';
 
 const app = express();
 
@@ -33,6 +34,9 @@ app.use(cors({
 // Request body limits (Handles 413 status code error)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Insert header in all routes
+app.use('/api', noCache);
 
 //API routes
 app.use('/api/reviewer-auth', reviewerAuthRoutes);

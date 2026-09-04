@@ -1,7 +1,6 @@
 import express from 'express';
 import multer from 'multer';
 import { authenticateToken } from '../middleware/authenticateToken.js';
-import { noCache } from '../middleware/noCache.js';
 import { VisionistaController } from '../controllers/visionistaController.js';
 
 const router = express.Router();
@@ -14,7 +13,7 @@ const upload = multer({ storage });
 router.post('/add-visionista', authenticateToken, upload.single('image'), visionistaController.addVisionista);
 
 // GET route
-router.get('/get-all-visionistas', noCache, visionistaController.getAllVisionistas);
+router.get('/get-all-visionistas', visionistaController.getAllVisionistas);
 router.get('/temporary-deleted-visionistas', authenticateToken, visionistaController.getAllTemporarilyDeletedVisionistas);
 
 // PATCH route
