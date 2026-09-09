@@ -27,6 +27,7 @@ export class AwsService {
             Key: fileKey,
             Body: file.buffer,
             ContentType: file.mimetype,
+            CacheControl: "max-age=31536000, immutable",
         };
 
         const command = new PutObjectCommand(uploadParameters);
@@ -46,6 +47,7 @@ export class AwsService {
             Key: fileKey,
             Body: file.buffer,
             ContentType: file.mimetype,
+            CacheControl: "max-age=31536000, immutable",
         };
 
         const command = new PutObjectCommand(uploadParameters);
@@ -65,6 +67,7 @@ export class AwsService {
             Key: fileKey,
             Body: file.buffer,
             ContentType: file.mimetype,
+            CacheControl: "max-age=31536000, immutable",
         };
 
         const command = new PutObjectCommand(uploadParameters);
