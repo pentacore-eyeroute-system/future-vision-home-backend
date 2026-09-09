@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid4 } from "uuid";
+import sharp from "sharp";
 import config from '../config/env.js';
 
 const AWS_ACCESS_KEY_ID = config.s3.accessKeyId;
@@ -19,14 +20,25 @@ const s3 = new S3Client({
 export class AwsService {
     async uploadVisionistaPic(file) {
         const folderName = 'visionistas-pictures';
-        const extension = file.mimetype.split('/')[1];
-        const fileKey = `${folderName}/${uuid4()}.${extension}`;
+        const processedBuffer = await sharp(file.buffer)
+            .resize({
+                width: 1000,
+                withoutEnlargement: true // Don't stretch small images to 1000px
+            })
+            .png({ 
+                palette: true, // It acts like pngquant
+                quality: 80,
+                compressionLevel: 9 
+            })
+            .toBuffer();
+
+        const fileKey = `${folderName}/${uuid4()}.png`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
             Key: fileKey,
-            Body: file.buffer,
-            ContentType: file.mimetype,
+            Body: processedBuffer,
+            ContentType: "image/png",
             CacheControl: "max-age=31536000, immutable",
         };
 
@@ -39,14 +51,25 @@ export class AwsService {
 
     async uploadNewsPic(file) {
         const folderName = 'news-pictures';
-        const extension = file.mimetype.split('/')[1];
-        const fileKey = `${folderName}/${uuid4()}.${extension}`;
+        const processedBuffer = await sharp(file.buffer)
+            .resize({
+                width: 1000,
+                withoutEnlargement: true // Don't stretch small images to 1000px
+            })
+            .png({ 
+                palette: true, // It acts like pngquant
+                quality: 80,
+                compressionLevel: 9 
+            })
+            .toBuffer();
+
+        const fileKey = `${folderName}/${uuid4()}.png`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
             Key: fileKey,
-            Body: file.buffer,
-            ContentType: file.mimetype,
+            Body: processedBuffer,
+            ContentType: "image/png",
             CacheControl: "max-age=31536000, immutable",
         };
 
@@ -59,14 +82,25 @@ export class AwsService {
 
     async uploadGalleryPic(file) {
         const folderName = 'galleries-pictures';
-        const extension = file.mimetype.split('/')[1];
-        const fileKey = `${folderName}/${uuid4()}.${extension}`;
+        const processedBuffer = await sharp(file.buffer)
+            .resize({
+                width: 1000,
+                withoutEnlargement: true // Don't stretch small images to 1000px
+            })
+            .png({ 
+                palette: true, // It acts like pngquant
+                quality: 80,
+                compressionLevel: 9 
+            })
+            .toBuffer();
+
+        const fileKey = `${folderName}/${uuid4()}.png`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
             Key: fileKey,
-            Body: file.buffer,
-            ContentType: file.mimetype,
+            Body: processedBuffer,
+            ContentType: "image/png",
             CacheControl: "max-age=31536000, immutable",
         };
 
