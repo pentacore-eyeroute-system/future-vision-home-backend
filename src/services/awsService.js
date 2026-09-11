@@ -25,20 +25,16 @@ export class AwsService {
                 width: 1000,
                 withoutEnlargement: true // Don't stretch small images to 1000px
             })
-            .png({ 
-                palette: true, // It acts like pngquant
-                quality: 80,
-                compressionLevel: 9 
-            })
+            .webp({ quality: 80 })
             .toBuffer();
 
-        const fileKey = `${folderName}/${uuid4()}.png`;
+        const fileKey = `${folderName}/${uuid4()}.webp`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
             Key: fileKey,
             Body: processedBuffer,
-            ContentType: "image/png",
+            ContentType: "image/webp",
             CacheControl: "max-age=31536000, immutable",
         };
 
@@ -56,14 +52,10 @@ export class AwsService {
                 width: 1000,
                 withoutEnlargement: true // Don't stretch small images to 1000px
             })
-            .png({ 
-                palette: true, // It acts like pngquant
-                quality: 80,
-                compressionLevel: 9 
-            })
+            .webp({ quality: 80 })
             .toBuffer();
 
-        const fileKey = `${folderName}/${uuid4()}.png`;
+        const fileKey = `${folderName}/${uuid4()}.webp`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
@@ -87,14 +79,10 @@ export class AwsService {
                 width: 1000,
                 withoutEnlargement: true // Don't stretch small images to 1000px
             })
-            .png({ 
-                palette: true, // It acts like pngquant
-                quality: 80,
-                compressionLevel: 9 
-            })
+            .webp({ quality: 80 })
             .toBuffer();
 
-        const fileKey = `${folderName}/${uuid4()}.png`;
+        const fileKey = `${folderName}/${uuid4()}.webp`;
 
         const uploadParameters = {
             Bucket: S3_BUCKET_NAME,
