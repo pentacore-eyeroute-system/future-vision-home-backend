@@ -14,32 +14,60 @@ const userApplicationService = new UserApplicationService();
 const auditLogService = new AuditLogService();
 
 export class AdminAuthService {
-    async signup(userData) {
-        const hashedPassword = await authUtil.hashPassword(userData.password);
+    async signup(userData, req) {
+        const transaction = await sequelize.transaction();
 
-        userData = {
-            ...userData,
-            password : hashedPassword
+        try {
+            const hashedPassword = await authUtil.hashPassword(userData.password);
+
+            userData = {
+                ...userData,
+                password : hashedPassword
+            }
+
+            const existingUser = await userService.findByEmail(userData.email, transaction);
+
+            if (existingUser) {
+                let errorMessage = ''
+
+                errorMessage = existingUser.usr_role === 'reviewer' 
+                                ? 'Email is already registered as a reviewer and cannot be used for a staff account.'
+                                : 'Email is already registered as a Future Vision Home staff member'
+
+                const error = new Error(errorMessage);
+                error.statusCode = 409;
+
+                throw error;
+            }
+
+            const user = await userApplicationService.addApplication(userData, transaction);
+
+            await auditLogService.log({
+                actorUserId: null,
+                targetUserId: null,
+                targetApplicationId: user.id,
+                actionType: ACTION_TYPES.SUBMITTED_REQUEST,
+                category: CATEGORIES.ACCESS,
+                severity: SEVERITIES.INFO,
+                isSecurityAlert: false,
+                details: `Submitted onboarding access request for ${userData.fullname} (${userData.email}).`,
+                metadata: {
+                    applicationId: user.id,
+                    email: userData.email,
+                    username: userData.username
+                },
+                request: req,
+                transaction
+            });
+
+            await transaction.commit();
+
+            return user;
+        } catch (err) {
+            await transaction.rollback();
+
+            throw err;
         }
-
-        const existingUser = await userService.findByEmail(userData.email);
-
-        if (existingUser) {
-            let errorMessage = ''
-
-            errorMessage = existingUser.usr_role === 'reviewer' 
-                            ? 'Email is already registered as a reviewer and cannot be used for a staff account.'
-                            : 'Email is already registered as a Future Vision Home staff member'
-
-            const error = new Error(errorMessage);
-            error.statusCode = 409;
-
-            throw error;
-        }
-
-        const user = await userApplicationService.addApplication(userData);
-
-        return user;
     };
     
     async login(ip, username, password, req) {

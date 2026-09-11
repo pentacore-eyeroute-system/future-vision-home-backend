@@ -101,8 +101,8 @@ export class UserService {
         return user;
     };
 
-    async findByEmail(email) {
-        const user = await User.findOne({ where : { usr_email : email } });
+    async findByEmail(email, transaction) {
+        const user = await User.findOne({ where : { usr_email : email }, transaction });
 
         return user;
     }

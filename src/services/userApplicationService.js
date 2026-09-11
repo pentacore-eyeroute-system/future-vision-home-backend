@@ -1,7 +1,7 @@
 import { UserApplication } from "../models/userApplicationModel.js";
 
 export class UserApplicationService {
-    async addApplication(userApplicationData) {
+    async addApplication(userApplicationData, transaction) {
         try {
             const userApplication = await UserApplication.create({
                 apl_email: userApplicationData.email,
@@ -9,7 +9,7 @@ export class UserApplicationService {
                 apl_username: userApplicationData.username,
                 apl_password: userApplicationData.password,
                 apl_status: userApplicationData.status,
-            });
+            }, { transaction });
 
             return {
                 id: userApplication.id,

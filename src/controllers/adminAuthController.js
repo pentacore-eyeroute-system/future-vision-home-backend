@@ -12,7 +12,7 @@ export class AdminAuthController {
                 password: req.body.password.trim(),
             };
 
-            const result = await adminAuthService.signup(userData);
+            const result = await adminAuthService.signup(userData, req);
 
             res.status(201).json({
                 success : true,

@@ -5,6 +5,7 @@ import pkgSeq from "sequelize";
 const { Op } = pkgSeq;
 
 export const ACTION_TYPES = {
+    SUBMITTED_REQUEST: "SUBMITTED_REQUEST",
     APPROVED_REQUEST: "APPROVED_REQUEST",
     REJECTED_REQUEST: "REJECTED_REQUEST",
     PROMOTED_TO_ADMIN: "PROMOTED_TO_ADMIN",
@@ -40,6 +41,7 @@ export const ACTOR_TYPES = {
 };
 
 const ACTION_LABELS = {
+    [ACTION_TYPES.SUBMITTED_REQUEST]: "Access Request Submitted",
     [ACTION_TYPES.APPROVED_REQUEST]: "Access Request Approved",
     [ACTION_TYPES.REJECTED_REQUEST]: "Access Request Rejected",
     [ACTION_TYPES.PROMOTED_TO_ADMIN]: "Staff Promoted to Admin",

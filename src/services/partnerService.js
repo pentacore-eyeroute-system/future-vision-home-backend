@@ -1,18 +1,31 @@
 import { Partner } from "../models/partnerModel.js";
 
 export class PartnerService {
-    async createPartner(partnerData) {
+    async createPartner(partnerData, transaction) {
         const partner = await Partner.create({
             par_fullname : partnerData.fullname,
             par_type : partnerData.type,
             par_is_temporarily_deleted: false,
-        });
+        }, { transaction });
 
         return partner;
     };
 
     async getAllPartners() {
         const partner = await Partner.findAll({ where: { par_is_temporarily_deleted: false } });
+
+        return partner;
+    };
+
+    async findById(partnerId, transaction) {
+        const partner = await Partner.findByPk(partnerId, { transaction });
+
+        if (!partner) {
+            const error = new Error('Partner not found');
+            error.statusCode = 404;
+            
+            throw error;
+        }
 
         return partner;
     };
@@ -31,51 +44,32 @@ export class PartnerService {
         }));
     };
 
-    async updatePartnerInfo(partnerId, partnerData) {
-        const partner = await Partner.findByPk(partnerId);
+    async updatePartnerInfo(partnerId, partnerData, transaction) {
+        const partner = await this.findById(partnerId, transaction);
 
-        if (!partner) {
-            const error = new Error('Partner not found');
-            error.statusCode = 404;
-            
-            throw error;
-        }
-
-        partner.update({
+        await partner.update({
             par_fullname : partnerData.fullname,
             par_type : partnerData.type,
-        });
+        }, { transaction });
 
         return partner;
     };
 
-    async updateIsTemporarilyDeletedStatus(partnerId, isTemporarilyDeleted) {
-        const partner = await Partner.findByPk(partnerId);
+    async updateIsTemporarilyDeletedStatus(partnerId, isTemporarilyDeleted, transaction) {
+        const partner = await this.findById(partnerId, transaction);
 
-        if (!partner) {
-            const error = new Error('Partner not found');
-            error.statusCode = 404;
-            
-            throw error;
-        }
-
-        partner.update({
+        await partner.update({
             par_is_temporarily_deleted: isTemporarilyDeleted,
-        });
+        }, { transaction });
 
         return partner;
     };
 
-    async softDeletePartner(partnerId) {
-        const partner = await Partner.findByPk(partnerId);
+    async softDeletePartner(partnerId, transaction) {
+        const partner = await this.findById(partnerId, transaction);
 
-        if (!partner) {
-            const error = new Error('Partner not found');
-            error.statusCode = 404;
-            
-            throw error;
-        }
+        await partner.destroy({ transaction });
 
-        partner.destroy();
+        return partner;
     };
 }

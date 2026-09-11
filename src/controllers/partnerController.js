@@ -1,6 +1,6 @@
-import { PartnerService } from "../services/partnerService.js";
+import { PartnerManagementService } from "../services/partnerManagementService.js";
 
-const partnerService = new PartnerService();
+const partnerManagementService = new PartnerManagementService();
 
 export class PartnerController {
     addPartner = async (req, res) => {
@@ -10,7 +10,7 @@ export class PartnerController {
                 type : req.body.type,
             };
 
-            const result = await partnerService.createPartner(partnerData);
+            const result = await partnerManagementService.createPartner(partnerData, req.user.id, req);
 
             res.status(201).json({
                 success: true,
@@ -27,7 +27,7 @@ export class PartnerController {
 
     getAllPartners = async (req, res) => {
         try {
-            const result = await partnerService.getAllPartners();
+            const result = await partnerManagementService.getAllPartners();
 
             res.status(200).json({
                 success: true,
@@ -44,7 +44,7 @@ export class PartnerController {
 
     getAllTemporarilyDeletedPartners = async (req, res) => {
         try {
-            const result = await partnerService.getAllTemporarilyDeletedPartners();
+            const result = await partnerManagementService.getAllTemporarilyDeletedPartners();
 
             res.status(200).json({
                 success: true,
@@ -67,7 +67,7 @@ export class PartnerController {
                 type : req.body.type,
             };
 
-            const result = await partnerService.updatePartnerInfo(partnerId, partnerData);
+            const result = await partnerManagementService.updatePartnerInfo(partnerId, partnerData, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -94,7 +94,7 @@ export class PartnerController {
             const partnerId = req.params.id;
             const isTemporarilyDeleted = req.body.isTemporarilyDeleted;
 
-            const result = await partnerService.updateIsTemporarilyDeletedStatus(partnerId, isTemporarilyDeleted);
+            const result = await partnerManagementService.updateIsTemporarilyDeletedStatus(partnerId, isTemporarilyDeleted, req.user.id, req);
 
             res.status(200).json({
                 success: true,
@@ -120,11 +120,11 @@ export class PartnerController {
         try {
             const partnerId = req.params.id;
 
-            const result = await partnerService.softDeletePartner(partnerId);
+            const result = await partnerManagementService.softDeletePartner(partnerId, req.user.id, req);
 
             res.status(200).json({
                 success: true,
-                message: 'Visionista soft delete success',
+                message: 'Partner soft delete success',
             });
         } catch (err) {
             if (err.statusCode) {
