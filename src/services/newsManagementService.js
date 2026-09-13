@@ -169,7 +169,7 @@ export class NewsManagementService {
                 category: CATEGORIES.STAFF,
                 severity: SEVERITIES.INFO,
                 isSecurityAlert: false,
-                details: `Updated news article: "${updatedNews.nws_title}" (ID: newsId).`,
+                details: `Updated news article: "${updatedNews.nws_title}" (ID: ${newsId}).`,
                 metadata: { newsId, title: updatedNews.nws_title },
                 request: req,
                 transaction
