@@ -22,11 +22,19 @@ const hasValidMxRecord = async (email) => {
     if (!domain) return false;
 
     try {
-        const mxRecords = await dns.resolveMx(domain);
+        // Wrap DNS MX lookup with a 4-second timeout to prevent hanging on restrictive networks
+        const mxPromise = dns.resolveMx(domain);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("DNS MX lookup timeout")), 4000)
+        );
+
+        const mxRecords = await Promise.race([mxPromise, timeoutPromise]);
         if (!mxRecords || mxRecords.length === 0) return false;
         // RFC 7505 Null MX records publish an empty exchange ("" or ".") to explicitly declare no mail service
         return mxRecords.some(r => r.exchange && r.exchange.trim() !== "" && r.exchange.trim() !== ".");
     } catch (err) {
+        // Log DNS resolution errors internally for debugging without crashing the controller
+        console.warn(`DNS MX lookup failed for domain "${domain}":`, err.message);
         return false;
     }
 };
@@ -121,6 +129,7 @@ export class AdminAuthController {
                 });
             }
 
+            console.error("Signup error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -160,6 +169,7 @@ export class AdminAuthController {
                 });
             }
 
+            console.error("Login error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -198,6 +208,7 @@ export class AdminAuthController {
                 });
             }
 
+            console.error("Confirm password error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -235,6 +246,7 @@ export class AdminAuthController {
                 });
             }
 
+            console.error("Update password error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
