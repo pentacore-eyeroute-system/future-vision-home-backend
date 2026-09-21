@@ -18,7 +18,9 @@ const sanitizeString = (val) => {
 // Helper function to verify if an email domain has active DNS MX records
 const hasValidMxRecord = async (email) => {
     if (typeof email !== "string" || !email.includes("@")) return false;
+    
     const domain = email.split("@")[1];
+    
     if (!domain) return false;
 
     try {
@@ -29,12 +31,11 @@ const hasValidMxRecord = async (email) => {
         );
 
         const mxRecords = await Promise.race([mxPromise, timeoutPromise]);
+        
         if (!mxRecords || mxRecords.length === 0) return false;
         // RFC 7505 Null MX records publish an empty exchange ("" or ".") to explicitly declare no mail service
         return mxRecords.some(r => r.exchange && r.exchange.trim() !== "" && r.exchange.trim() !== ".");
     } catch (err) {
-        // Log DNS resolution errors internally for debugging without crashing the controller
-        console.warn(`DNS MX lookup failed for domain "${domain}":`, err.message);
         return false;
     }
 };
@@ -103,9 +104,11 @@ const updatePasswordSchema = z.object({
 // Helper function to safely extract error messages from Zod error objects
 const getZodErrorMessage = (error) => {
     const issues = error?.issues || error?.errors || [];
+    
     if (issues.length > 0) {
-        return issues.map(e => e.message).join(', ');
+        return issues.map(e => e.message).join('. ');
     }
+    
     return error?.message || 'Invalid input data';
 };
 
@@ -113,8 +116,10 @@ export class AdminAuthController {
     signup = async (req, res) => {
         try {
             const validation = await signupSchema.safeParseAsync(req.body);
+            
             if (!validation.success) {
                 const errorMessage = getZodErrorMessage(validation.error);
+                
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -138,7 +143,6 @@ export class AdminAuthController {
                 });
             }
 
-            console.error("Signup error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -149,7 +153,9 @@ export class AdminAuthController {
     login = async (req, res) => {
         try {
             const validation = loginSchema.safeParse(req.body);
+            
             if (!validation.success) {
+                
                 const errorMessage = getZodErrorMessage(validation.error);
                 return res.status(400).json({
                     success: false,
@@ -178,7 +184,6 @@ export class AdminAuthController {
                 });
             }
 
-            console.error("Login error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -189,8 +194,10 @@ export class AdminAuthController {
     confirmPassword = async (req, res) => {
         try {
             const validation = confirmPasswordSchema.safeParse(req.body);
+            
             if (!validation.success) {
                 const errorMessage = getZodErrorMessage(validation.error);
+            
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -217,7 +224,6 @@ export class AdminAuthController {
                 });
             }
 
-            console.error("Confirm password error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
@@ -228,8 +234,10 @@ export class AdminAuthController {
     updatePassword = async (req, res) => {
         try {
             const validation = updatePasswordSchema.safeParse(req.body);
+            
             if (!validation.success) {
                 const errorMessage = getZodErrorMessage(validation.error);
+                
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -255,7 +263,6 @@ export class AdminAuthController {
                 });
             }
 
-            console.error("Update password error:", err);
             res.status(500).json({
                 success: false,
                 error: 'An internal server error occurred',
