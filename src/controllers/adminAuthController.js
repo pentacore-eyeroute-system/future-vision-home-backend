@@ -100,12 +100,21 @@ const updatePasswordSchema = z.object({
     password: passwordValidationSchema
 });
 
+// Helper function to safely extract error messages from Zod error objects
+const getZodErrorMessage = (error) => {
+    const issues = error?.issues || error?.errors || [];
+    if (issues.length > 0) {
+        return issues.map(e => e.message).join(', ');
+    }
+    return error?.message || 'Invalid input data';
+};
+
 export class AdminAuthController {
     signup = async (req, res) => {
         try {
             const validation = await signupSchema.safeParseAsync(req.body);
             if (!validation.success) {
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = getZodErrorMessage(validation.error);
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -141,7 +150,7 @@ export class AdminAuthController {
         try {
             const validation = loginSchema.safeParse(req.body);
             if (!validation.success) {
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = getZodErrorMessage(validation.error);
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -181,7 +190,7 @@ export class AdminAuthController {
         try {
             const validation = confirmPasswordSchema.safeParse(req.body);
             if (!validation.success) {
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = getZodErrorMessage(validation.error);
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
@@ -220,7 +229,7 @@ export class AdminAuthController {
         try {
             const validation = updatePasswordSchema.safeParse(req.body);
             if (!validation.success) {
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = getZodErrorMessage(validation.error);
                 return res.status(400).json({
                     success: false,
                     error: errorMessage
