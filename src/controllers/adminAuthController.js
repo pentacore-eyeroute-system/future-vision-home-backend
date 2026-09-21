@@ -1,19 +1,9 @@
 import dns from "dns/promises";
 import { z } from "zod";
 import { AdminAuthService } from "../services/adminAuthService.js";
+import { sanitizeString, getZodErrorMessage } from "../utils/sanitizeUtil.js";
 
 const adminAuthService = new AdminAuthService();
-
-// Helper function to sanitize strings against XSS attacks
-const sanitizeString = (val) => {
-    if (typeof val !== "string") return val;
-    return val
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
-};
 
 // Helper function to verify if an email domain has active DNS MX records
 const hasValidMxRecord = async (email) => {
@@ -100,17 +90,6 @@ const confirmPasswordSchema = z.object({
 const updatePasswordSchema = z.object({
     password: passwordValidationSchema
 });
-
-// Helper function to safely extract error messages from Zod error objects
-const getZodErrorMessage = (error) => {
-    const issues = error?.issues || error?.errors || [];
-    
-    if (issues.length > 0) {
-        return issues.map(e => e.message).join('. ');
-    }
-    
-    return error?.message || 'Invalid input data';
-};
 
 export class AdminAuthController {
     signup = async (req, res) => {
