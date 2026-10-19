@@ -35,6 +35,7 @@
     "mysql2": "^3.22.4",
     "nodemailer": "^9.0.5",
     "p-limit": "^7.3.0",
+    "sanitize-html": "^2.18.1",
     "sequelize": "^6.37.3",
     "sharp": "^0.35.4",
     "slugify": "^1.6.9",

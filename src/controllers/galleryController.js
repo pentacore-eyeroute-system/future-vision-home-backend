@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { GalleryManagementService } from "../services/galleryManagementService.js";
-import { xssSafeString, optionalXssSafeString, getZodErrorMessage } from "../utils/sanitizeUtil.js";
+import { xssSafeString, optionalRichTextXssSafeString, getZodErrorMessage } from "../utils/sanitizeUtil.js";
 
 const galleryManagementService = new GalleryManagementService();
 
 const createGallerySchema = z.object({
     title: xssSafeString("Title", 255),
-    description: optionalXssSafeString("Description", 5000),
+    description: optionalRichTextXssSafeString("Description", 5000),
     date: z.string({ required_error: "Date is required" }).trim().min(1, "Date is required")
 });
 
 const updateGallerySchema = z.object({
     title: xssSafeString("Title", 255),
-    description: optionalXssSafeString("Description", 5000),
+    description: optionalRichTextXssSafeString("Description", 5000),
     date: z.string({ required_error: "Date is required" }).trim().min(1, "Date is required")
 });
 

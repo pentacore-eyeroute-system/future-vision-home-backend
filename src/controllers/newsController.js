@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { NewsManagementService } from "../services/newsManagementService.js";
-import { xssSafeString, optionalXssSafeString, getZodErrorMessage } from "../utils/sanitizeUtil.js";
+import { xssSafeString, optionalRichTextXssSafeString, getZodErrorMessage } from "../utils/sanitizeUtil.js";
 
 const newsManagementService = new NewsManagementService();
 
 const createNewsSchema = z.object({
     title: xssSafeString("Title", 255),
-    description: optionalXssSafeString("Description", 10000),
+    description: optionalRichTextXssSafeString("Description", 50000),
     date: z.string({ required_error: "Date is required" }).trim().min(1, "Date is required")
 });
 
 const updateNewsSchema = z.object({
     title: xssSafeString("Title", 255),
-    description: optionalXssSafeString("Description", 10000),
+    description: optionalRichTextXssSafeString("Description", 50000),
     date: z.string({ required_error: "Date is required" }).trim().min(1, "Date is required")
 });
 
