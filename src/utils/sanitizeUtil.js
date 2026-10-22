@@ -78,3 +78,28 @@ export const getZodErrorMessage = (error) => {
     }
     return error?.message || 'Invalid input data';
 };
+
+/**
+ * Sanitizes a cell value to prevent CSV Formula Injection (OWASP CWE-1236).
+ * Prepends a single quote if the cell begins with formula trigger characters (=, +, -, @, tab, newline).
+ * Escapes double quotes and encloses fields containing delimiters in quotes per RFC 4180.
+ */
+export const sanitizeCsvCell = (val) => {
+    if (val === null || val === undefined) return "";
+    let str = String(val);
+
+    // Check if the trimmed value starts with formula characters (=, +, -, @, \t, \r)
+    const trimmed = str.trimStart();
+    if (/^[=+\-@\t\r]/.test(trimmed)) {
+        // Prepend single quote (') so spreadsheet apps (Excel, Sheets, Calc) treat it as literal plain text
+        str = `'${str}`;
+    }
+
+    // RFC 4180: If value contains commas, double quotes, or newlines, escape quotes and enclose in quotes
+    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+        str = str.replace(/"/g, '""');
+        return `"${str}"`;
+    }
+
+    return str;
+};

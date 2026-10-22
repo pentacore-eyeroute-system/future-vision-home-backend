@@ -1,4 +1,5 @@
 import { AuditLogService, ACTION_TYPES, CATEGORIES, SEVERITIES } from "./auditLogService.js";
+import { sanitizeCsvCell } from "../utils/sanitizeUtil.js";
 
 const auditLogService = new AuditLogService();
 
@@ -53,16 +54,6 @@ export class AuditLogManagementService {
             "User Agent"
         ];
 
-        const escapeCsvValue = (val) => {
-            if (val === null || val === undefined) return "";
-            let str = String(val);
-            if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
-                str = str.replace(/"/g, '""');
-                return `"${str}"`;
-            }
-            return str;
-        };
-
         const rows = logs.map(log => [
             log.id,
             log.timestamp,
@@ -90,7 +81,7 @@ export class AuditLogManagementService {
 
         const csvContent = [
             headers.join(","),
-            ...rows.map(row => row.map(escapeCsvValue).join(","))
+            ...rows.map(row => row.map(sanitizeCsvCell).join(","))
         ].join("\n");
 
         return csvContent;
